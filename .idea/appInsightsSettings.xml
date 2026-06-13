@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.ngoctientnt.template.staging" />
+                  <option name="mobileSdkAppId" value="1:33824446463:android:565bca32ef169fb37939ca" />
+                  <option name="projectId" value="flutter-template-staging-tnt" />
+                  <option name="projectNumber" value="33824446463" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

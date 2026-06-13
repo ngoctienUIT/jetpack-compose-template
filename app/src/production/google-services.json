@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "463953047485",
+    "project_id": "flutter-template-prod-tnt",
+    "storage_bucket": "flutter-template-prod-tnt.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:463953047485:android:6ce416816919269e212cd4",
+        "android_client_info": {
+          "package_name": "com.ngoctientnt.template"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAtlggJo2J-e3tQh2sPrhNQWLafhhIpWdY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

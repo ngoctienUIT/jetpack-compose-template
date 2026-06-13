@@ -11,7 +11,7 @@ plugins {
 android {
     namespace = "com.ngoctientnt.template"
     compileSdk {
-        version = release(36)
+        version = release(37)
     }
 
     defaultConfig {

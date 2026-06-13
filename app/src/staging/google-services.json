@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "33824446463",
+    "project_id": "flutter-template-staging-tnt",
+    "storage_bucket": "flutter-template-staging-tnt.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:33824446463:android:565bca32ef169fb37939ca",
+        "android_client_info": {
+          "package_name": "com.ngoctientnt.template.staging"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCBsQGyANlCN4Ml5txSmNIYk8lq9QN8WLc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
