@@ -1,21 +1,69 @@
 # Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# https://developer.android.com/studio/build/shrink-code
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# Keep line numbers for readable crash reports in Play Console
+-keepattributes SourceFile,LineNumberTable
+-renamesourcefileattribute SourceFile
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# --- Kotlin ---
+-keep class kotlin.Metadata { *; }
+-dontwarn kotlin.**
+-keepclassmembers class **$WhenMappings {
+    <fields>;
+}
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# --- Kotlinx Serialization ---
+-keepattributes *Annotation*, InnerClasses
+-dontnote kotlinx.serialization.**
+-keepclassmembers class kotlinx.serialization.json.** {
+    *** Companion;
+}
+-keepclasseswithmembers class * {
+    @kotlinx.serialization.SerialName <fields>;
+}
+-keep @kotlinx.serialization.Serializable class * {
+    <fields>;
+    <init>(...);
+}
+
+# --- Retrofit ---
+-dontwarn okhttp3.**
+-dontwarn okio.**
+-dontwarn javax.annotation.**
+-keepclasseswithmembers class * {
+    @retrofit2.http.* <methods>;
+}
+-keep,allowobfuscation,allowshrinking interface * {
+    @retrofit2.http.* <methods>;
+}
+-keep,allowobfuscation,allowshrinking class retrofit2.Response
+
+# --- Hilt / Dagger ---
+-dontwarn com.google.errorprone.annotations.**
+-keep class dagger.hilt.** { *; }
+-keep class javax.inject.** { *; }
+-keepclasseswithmembers class * {
+    @javax.inject.* <fields>;
+}
+-keepclasseswithmembers class * {
+    @javax.inject.* <methods>;
+}
+
+# --- Room (ready when @Database is added) ---
+-keep class * extends androidx.room.RoomDatabase
+-keep @androidx.room.Entity class *
+-dontwarn androidx.room.paging.**
+
+# --- Coil ---
+-dontwarn coil.**
+
+# --- Firebase ---
+-keep class com.google.firebase.** { *; }
+-dontwarn com.google.firebase.**
+
+# --- App models & navigation routes ---
+-keep class com.ngoctientnt.template.app.navigation.** { *; }
+-keep class com.ngoctientnt.template.core.appinfo.model.** { *; }
+
+# --- Window extensions (Compose / Activity) ---
+-dontwarn androidx.window.**

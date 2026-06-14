@@ -2,7 +2,9 @@ package com.ngoctientnt.template.app.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.ngoctientnt.template.feature.detail.DetailScreen
 import com.ngoctientnt.template.feature.favorite.FavoriteScreen
@@ -15,9 +17,15 @@ fun AppNavHost(
     appBackStack: AppBackStack,
     appNavigator: AppNavigator,
 ) {
+    val backStack = rememberNavBackStack(SplashRoute)
+
+    LaunchedEffect(backStack) {
+        appBackStack.attach(backStack)
+    }
+
     CompositionLocalProvider(LocalAppNavigator provides appNavigator) {
         NavDisplay(
-            backStack = appBackStack.backStack,
+            backStack = backStack,
             onBack = appBackStack::pop,
             transitionSpec = AppNavTransitions.push,
             popTransitionSpec = AppNavTransitions.pop,

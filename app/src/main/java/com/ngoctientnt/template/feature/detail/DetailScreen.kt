@@ -4,9 +4,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import com.ngoctientnt.template.ui.component.button.AppFilledButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,11 +30,10 @@ fun DetailScreen(id: String) {
             text = stringResource(R.string.detail_title, id),
             style = MaterialTheme.typography.headlineMedium,
         )
-        Button(
+        AppFilledButton(
             onClick = navigator::pop,
             modifier = Modifier.padding(top = 16.dp),
-        ) {
-            Text(stringResource(R.string.action_back))
-        }
+            text = stringResource(R.string.action_back),
+        )
     }
 }

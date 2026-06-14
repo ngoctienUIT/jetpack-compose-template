@@ -5,11 +5,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import com.ngoctientnt.template.R
 
-/**
- * Supported app languages. To add a new language:
- * 1. Add an entry here with its BCP-47 language tag.
- * 2. Create `res/values-<tag>/strings.xml` with translated strings.
- */
 enum class AppLanguage(
     val languageTag: String?,
     @StringRes val displayNameRes: Int,

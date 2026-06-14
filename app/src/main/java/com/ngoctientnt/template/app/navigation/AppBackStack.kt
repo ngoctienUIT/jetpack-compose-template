@@ -1,45 +1,70 @@
 package com.ngoctientnt.template.app.navigation
 
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
 
-@Stable
 class AppBackStack {
 
-    private val _backStack =
-        mutableStateListOf<Any>(SplashRoute)
+    private var navBackStack: NavBackStack<NavKey>? = null
+    private val pendingOperations = mutableListOf<() -> Unit>()
 
-    val backStack: SnapshotStateList<Any>
-        get() = _backStack
+    val backStack: NavBackStack<NavKey>
+        get() = requireNotNull(navBackStack) {
+            "NavBackStack is not attached yet. Ensure AppNavHost is composed."
+        }
 
-    fun navigate(route: Any) {
-        _backStack.add(route)
+    fun attach(stack: NavBackStack<NavKey>) {
+        navBackStack = stack
+        pendingOperations.forEach { operation -> operation() }
+        pendingOperations.clear()
     }
 
-    fun replace(route: Any) {
-        _backStack.removeLastOrNull()
-        _backStack.add(route)
+    fun navigate(route: NavKey) {
+        runWhenAttached { it.add(route) }
     }
 
-    fun replaceAll(route: Any) {
-        _backStack.clear()
-        _backStack.add(route)
+    fun replace(route: NavKey) {
+        runWhenAttached {
+            it.removeLastOrNull()
+            it.add(route)
+        }
+    }
+
+    fun replaceAll(route: NavKey) {
+        runWhenAttached {
+            it.clear()
+            it.add(route)
+        }
     }
 
     fun pop() {
-        if (_backStack.size > 1) {
-            _backStack.removeLastOrNull()
+        runWhenAttached { stack ->
+            if (stack.size > 1) {
+                stack.removeAt(stack.lastIndex)
+            }
         }
     }
 
     fun popToRoot() {
-        if (_backStack.size <= 1) return
-        val root = _backStack.first()
-        _backStack.clear()
-        _backStack.add(root)
+        runWhenAttached { stack ->
+            if (stack.size <= 1) return@runWhenAttached
+            val root = stack.first()
+            stack.clear()
+            stack.add(root)
+        }
     }
 
     val canPop: Boolean
-        get() = _backStack.size > 1
+        get() = (navBackStack?.size ?: 0) > 1
+
+    private inline fun runWhenAttached(crossinline block: (NavBackStack<NavKey>) -> Unit) {
+        val stack = navBackStack
+        if (stack != null) {
+            block(stack)
+        } else {
+            pendingOperations.add {
+                navBackStack?.let(block)
+            }
+        }
+    }
 }

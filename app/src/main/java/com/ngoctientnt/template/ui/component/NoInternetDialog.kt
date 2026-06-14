@@ -2,11 +2,11 @@ package com.ngoctientnt.template.ui.component
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.ngoctientnt.template.R
 import com.ngoctientnt.template.core.network.NetworkStatus
+import com.ngoctientnt.template.ui.component.button.AppTextButton
 
 @Composable
 fun NoInternetDialog(
@@ -24,9 +24,10 @@ fun NoInternetDialog(
             Text(text = stringResource(R.string.no_internet_message))
         },
         confirmButton = {
-            TextButton(onClick = onRetry) {
-                Text(text = stringResource(R.string.no_internet_retry))
-            }
+            AppTextButton(
+                text = stringResource(R.string.no_internet_retry),
+                onClick = onRetry,
+            )
         },
     )
 }

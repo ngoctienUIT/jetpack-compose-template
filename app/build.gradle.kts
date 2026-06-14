@@ -8,6 +8,15 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
+import java.util.Properties
+
+val signingPropertiesFile = rootProject.file("secrets/signing.properties")
+val signingProperties = Properties().apply {
+    if (signingPropertiesFile.exists()) {
+        signingPropertiesFile.inputStream().use { load(it) }
+    }
+}
+
 android {
     namespace = "com.ngoctientnt.template"
     compileSdk {
@@ -22,6 +31,21 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        vectorDrawables {
+            useSupportLibrary = true
+        }
+    }
+
+    signingConfigs {
+        create("release") {
+            if (signingPropertiesFile.exists()) {
+                storeFile = rootProject.file(signingProperties.getProperty("storeFile"))
+                storePassword = signingProperties.getProperty("storePassword")
+                keyAlias = signingProperties.getProperty("keyAlias")
+                keyPassword = signingProperties.getProperty("keyPassword")
+            }
+        }
     }
 
     flavorDimensions += "environment"
@@ -43,22 +67,44 @@ android {
     }
 
     buildTypes {
-        release {
+        debug {
+            versionNameSuffix = "-debug"
             isMinifyEnabled = false
+            isShrinkResources = false
+        }
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
+            signingConfig = when {
+                signingPropertiesFile.exists() -> signingConfigs.getByName("release")
+                else -> signingConfigs.getByName("debug")
+            }
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+
+    kotlin {
+        jvmToolchain(17)
+    }
+
     buildFeatures {
         buildConfig = true
         compose = true
         resValues = true
+    }
+
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
     }
 }
 
@@ -90,15 +136,16 @@ dependencies {
     implementation(libs.logging.interceptor)
     implementation(libs.kotlinx.serialization.json)
 
-    // Room
+    // Room — dependency ready; add @Database when implementing local cache
     ksp(libs.hilt.compiler)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.datastore.preferences)
 
-    implementation(libs.coil.compose.base)
+    implementation(libs.coil.compose)
 
+    // Paging — dependency ready; wire when implementing paginated lists
     implementation(libs.androidx.paging.runtime)
     implementation(libs.androidx.paging.compose)
 

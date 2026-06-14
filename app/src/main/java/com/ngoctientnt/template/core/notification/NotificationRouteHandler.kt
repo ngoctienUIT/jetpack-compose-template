@@ -5,6 +5,7 @@ import com.ngoctientnt.template.app.navigation.AppNavigator
 import com.ngoctientnt.template.app.navigation.BottomNavTab
 import com.ngoctientnt.template.app.navigation.DetailRoute
 import com.ngoctientnt.template.app.navigation.MainRoute
+import com.ngoctientnt.template.core.config.NotificationRoutes
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -17,9 +18,9 @@ class NotificationRouteHandler @Inject constructor() {
         }
 
         when (intent.getStringExtra(NotificationHelper.EXTRA_ROUTE)) {
-            "home" -> appNavigator.replaceAll(MainRoute(tab = BottomNavTab.HOME.name))
-            "profile" -> appNavigator.replaceAll(MainRoute(tab = BottomNavTab.PROFILE.name))
-            "detail" -> {
+            NotificationRoutes.HOME -> appNavigator.replaceAll(MainRoute(tab = BottomNavTab.HOME.name))
+            NotificationRoutes.PROFILE -> appNavigator.replaceAll(MainRoute(tab = BottomNavTab.PROFILE.name))
+            NotificationRoutes.DETAIL -> {
                 val id = intent.getStringExtra(NotificationHelper.EXTRA_DETAIL_ID) ?: return
                 appNavigator.navigate(DetailRoute(id = id))
             }

@@ -17,6 +17,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ngoctientnt.template.app.App
 import com.ngoctientnt.template.app.navigation.AppBackStack
 import com.ngoctientnt.template.app.navigation.AppNavigator
+import com.ngoctientnt.template.core.appinfo.AppInfoManager
 import com.ngoctientnt.template.core.notification.FcmTokenManager
 import com.ngoctientnt.template.core.notification.NotificationRouteHandler
 import com.ngoctientnt.template.feature.theme.ThemeViewModel
@@ -39,6 +40,9 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var notificationRouteHandler: NotificationRouteHandler
 
+    @Inject
+    lateinit var appInfoManager: AppInfoManager
+
     private val notificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { /* Permission result is handled by the system notification settings. */ }
@@ -58,6 +62,7 @@ class MainActivity : AppCompatActivity() {
                 App(
                     appBackStack = appBackStack,
                     appNavigator = appNavigator,
+                    appInfoManager = appInfoManager,
                 )
             }
         }

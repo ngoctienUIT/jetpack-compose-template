@@ -25,7 +25,10 @@
 
     <string name="splash_loading">Đang tải…</string>
     <string name="login_title">Đăng nhập</string>
+    <string name="login_email">Email</string>
+    <string name="login_password">Mật khẩu</string>
     <string name="login_sign_in">Đăng nhập</string>
+    <string name="login_forgot_password">Quên mật khẩu?</string>
     <string name="home_title">Trang chủ</string>
     <string name="home_open_detail">Mở chi tiết</string>
     <string name="home_open_profile">Mở hồ sơ</string>
@@ -41,6 +44,7 @@
 
     <string name="explore_title">Khám phá</string>
     <string name="explore_subtitle">Tìm nội dung mới tại đây.</string>
+    <string name="explore_sample_image">Ảnh mẫu khám phá</string>
     <string name="activity_title">Hoạt động</string>
     <string name="activity_subtitle">Thông báo và cập nhật gần đây.</string>
     <string name="favorite_title">Yêu thích</string>

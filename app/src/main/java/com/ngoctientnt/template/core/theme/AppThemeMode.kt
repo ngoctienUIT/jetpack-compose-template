@@ -4,10 +4,6 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatDelegate
 import com.ngoctientnt.template.R
 
-/**
- * Supported app theme modes. To add a new mode, extend this enum and update
- * [ThemeRepository] persistence if needed.
- */
 enum class AppThemeMode(
     val storageValue: String?,
     @StringRes val displayNameRes: Int,

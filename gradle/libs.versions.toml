@@ -24,6 +24,7 @@ loggingInterceptor = "5.4.0"
 navigation3Runtime = "1.1.2"
 okhttp = "5.4.0"
 pagingRuntime = "3.5.0"
+hiltNavigationCompose = "1.3.0"
 retrofit = "3.0.0"
 roomRuntime = "2.8.4"
 
@@ -31,7 +32,7 @@ roomRuntime = "2.8.4"
 androidx-compose-adaptive-navigation = { module = "androidx.compose.material3.adaptive:adaptive-navigation", version.ref = "adaptiveNavigation" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
-androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version = "1.3.0" }
+androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycleRuntimeCompose" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeCompose" }
 androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycleRuntimeCompose" }
@@ -42,7 +43,7 @@ androidx-paging-runtime = { module = "androidx.paging:paging-runtime", version.r
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
-coil-compose-base = { module = "io.coil-kt:coil-compose-base", version.ref = "coilComposeBase" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilComposeBase" }
 converter-kotlinx-serialization = { module = "com.squareup.retrofit2:converter-kotlinx-serialization", version.ref = "converterKotlinxSerialization" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }

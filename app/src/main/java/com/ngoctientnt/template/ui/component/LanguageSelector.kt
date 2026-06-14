@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
@@ -18,6 +17,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.ngoctientnt.template.R
 import com.ngoctientnt.template.core.locale.AppLanguage
+import com.ngoctientnt.template.ui.component.button.AppFilledButton
 
 @Composable
 fun LanguageSelector(
@@ -41,15 +41,13 @@ fun LanguageSelector(
             )
         }
 
-        Button(
+        AppFilledButton(
+            text = stringResource(R.string.language_apply),
             onClick = onApply,
             enabled = canApply,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp),
-        ) {
-            Text(text = stringResource(R.string.language_apply))
-        }
+            fullWidth = true,
+            modifier = Modifier.padding(top = 16.dp),
+        )
     }
 }
 

@@ -14,6 +14,7 @@ import androidx.compose.ui.res.stringResource
 import com.ngoctientnt.template.R
 import com.ngoctientnt.template.app.navigation.MainRoute
 import com.ngoctientnt.template.app.navigation.LocalAppNavigator
+import com.ngoctientnt.template.core.config.AppConfig
 import kotlinx.coroutines.delay
 
 @Composable
@@ -21,7 +22,7 @@ fun SplashScreen() {
     val navigator = LocalAppNavigator.current
 
     LaunchedEffect(Unit) {
-        delay(1_500)
+        delay(AppConfig.SPLASH_DELAY_MS)
         // TODO: check auth state — replaceAll(LoginRoute) if not logged in
         navigator.replaceAll(MainRoute())
     }

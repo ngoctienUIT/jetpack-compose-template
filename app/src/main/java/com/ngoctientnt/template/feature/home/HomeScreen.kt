@@ -4,9 +4,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import com.ngoctientnt.template.ui.component.button.AppFilledButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,11 +31,10 @@ fun HomeScreen() {
             text = stringResource(R.string.home_title),
             style = MaterialTheme.typography.headlineMedium,
         )
-        Button(
+        AppFilledButton(
             onClick = { navigator.navigate(DetailRoute(id = "42")) },
             modifier = Modifier.padding(top = 16.dp),
-        ) {
-            Text(stringResource(R.string.home_open_detail))
-        }
+            text = stringResource(R.string.home_open_detail),
+        )
     }
 }

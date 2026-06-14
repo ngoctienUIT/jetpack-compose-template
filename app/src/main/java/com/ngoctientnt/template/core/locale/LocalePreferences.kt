@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.ngoctientnt.template.core.config.DataStoreNames
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -14,7 +15,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 private val Context.localeDataStore: DataStore<Preferences> by preferencesDataStore(
-    name = "locale_preferences",
+    name = DataStoreNames.LOCALE,
 )
 
 @Singleton

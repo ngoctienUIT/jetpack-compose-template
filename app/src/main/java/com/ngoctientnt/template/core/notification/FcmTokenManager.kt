@@ -1,7 +1,7 @@
 package com.ngoctientnt.template.core.notification
 
-import android.util.Log
 import com.google.firebase.messaging.FirebaseMessaging
+import com.ngoctientnt.template.core.logging.AppLogger
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -12,7 +12,7 @@ class FcmTokenManager @Inject constructor() {
         FirebaseMessaging.getInstance().token
             .addOnCompleteListener { task ->
                 if (!task.isSuccessful) {
-                    Log.w(TAG, "Failed to fetch FCM token", task.exception)
+                    AppLogger.w(TAG, "Failed to fetch FCM token", task.exception)
                     onResult(null)
                     return@addOnCompleteListener
                 }
@@ -21,7 +21,7 @@ class FcmTokenManager @Inject constructor() {
     }
 
     fun onNewToken(token: String) {
-        Log.d(TAG, "FCM token refreshed: $token")
+        AppLogger.d(TAG, "FCM token refreshed")
         // TODO: Send token to your backend when API is ready.
     }
 

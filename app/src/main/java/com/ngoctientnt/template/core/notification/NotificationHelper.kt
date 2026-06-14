@@ -9,6 +9,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.ngoctientnt.template.MainActivity
 import com.ngoctientnt.template.R
+import com.ngoctientnt.template.core.config.NotificationRoutes
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -87,7 +88,7 @@ class NotificationHelper @Inject constructor(
     companion object {
         const val CHANNEL_ID = "default_notification_channel"
         const val EXTRA_FROM_NOTIFICATION = "extra_from_notification"
-        const val EXTRA_ROUTE = "route"
-        const val EXTRA_DETAIL_ID = "id"
+        const val EXTRA_ROUTE = NotificationRoutes.ROUTE
+        const val EXTRA_DETAIL_ID = NotificationRoutes.DETAIL_ID
     }
 }

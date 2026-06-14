@@ -14,6 +14,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import com.ngoctientnt.template.core.theme.AppThemeMode
+import com.ngoctientnt.template.ui.component.theme.AppComponentDefaults
+import com.ngoctientnt.template.ui.component.theme.AppComponentTheme
+import com.ngoctientnt.template.ui.component.theme.ProvideAppComponentTheme
 
 private val LightColorScheme = lightColorScheme(
     primary = LightPrimary,
@@ -73,6 +76,7 @@ private val DarkColorScheme = darkColorScheme(
 fun TemplateTheme(
     themeMode: AppThemeMode = AppThemeMode.SYSTEM,
     dynamicColor: Boolean = false,
+    componentTheme: AppComponentTheme? = null,
     content: @Composable () -> Unit,
 ) {
     val darkTheme = themeMode.isDarkTheme(isSystemInDarkTheme())
@@ -104,6 +108,12 @@ fun TemplateTheme(
         colorScheme = colorScheme,
         typography = Typography,
         shapes = AppShapes,
-        content = content,
+        content = {
+            ProvideAppComponentTheme(
+                theme = componentTheme ?: AppComponentDefaults.theme(),
+            ) {
+                content()
+            }
+        },
     )
 }

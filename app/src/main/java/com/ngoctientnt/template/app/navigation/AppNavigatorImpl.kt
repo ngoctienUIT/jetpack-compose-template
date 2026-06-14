@@ -1,19 +1,21 @@
 package com.ngoctientnt.template.app.navigation
 
+import androidx.navigation3.runtime.NavKey
+
 class AppNavigatorImpl(
-    private val appBackStack: AppBackStack
+    private val appBackStack: AppBackStack,
 ) : AppNavigator {
 
     override fun navigate(route: Any) {
-        appBackStack.navigate(route)
+        appBackStack.navigate(route as NavKey)
     }
 
     override fun replace(route: Any) {
-        appBackStack.replace(route)
+        appBackStack.replace(route as NavKey)
     }
 
     override fun replaceAll(route: Any) {
-        appBackStack.replaceAll(route)
+        appBackStack.replaceAll(route as NavKey)
     }
 
     override fun pop() {

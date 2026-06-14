@@ -13,3 +13,12 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Signing — copy from secrets/signing.properties.example
+secrets/signing.properties
+secrets/*.jks
+secrets/*.keystore
+
+# Firebase — copy from *.example after cloning (committed files are template placeholders)
+# app/src/staging/google-services.json
+# app/src/production/google-services.json

@@ -4,8 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import com.ngoctientnt.template.ui.component.button.AppFilledButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -35,11 +35,10 @@ fun FavoriteScreen() {
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.padding(top = 8.dp),
         )
-        Button(
+        AppFilledButton(
             onClick = navigator::pop,
             modifier = Modifier.padding(top = 24.dp),
-        ) {
-            Text(stringResource(R.string.action_back))
-        }
+            text = stringResource(R.string.action_back),
+        )
     }
 }

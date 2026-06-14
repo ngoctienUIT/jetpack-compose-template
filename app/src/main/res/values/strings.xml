@@ -30,7 +30,10 @@
     <!-- Screens -->
     <string name="splash_loading">Loading…</string>
     <string name="login_title">Login</string>
+    <string name="login_email">Email</string>
+    <string name="login_password">Password</string>
     <string name="login_sign_in">Sign in</string>
+    <string name="login_forgot_password">Forgot password?</string>
     <string name="home_title">Home</string>
     <string name="home_open_detail">Open Detail</string>
     <string name="home_open_profile">Open Profile</string>
@@ -47,6 +50,7 @@
 
     <string name="explore_title">Explore</string>
     <string name="explore_subtitle">Discover new content here.</string>
+    <string name="explore_sample_image">Sample explore image</string>
     <string name="activity_title">Activity</string>
     <string name="activity_subtitle">Your recent notifications and updates.</string>
     <string name="favorite_title">Favorites</string>
