@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">Template</string>
+    <string name="default_notification_channel_id">default_notification_channel</string>
+
+    <string name="language_system">Theo hệ thống</string>
+    <string name="language_english">English</string>
+    <string name="language_vietnamese">Tiếng Việt</string>
+
+    <string name="settings_language">Ngôn ngữ</string>
+    <string name="language_apply">Xác nhận</string>
+
+    <string name="notification_channel_name">Thông báo chung</string>
+    <string name="notification_channel_description">Cập nhật và thông báo từ ứng dụng</string>
+
+    <string name="no_internet_title">Không có kết nối internet</string>
+    <string name="no_internet_message">Vui lòng kiểm tra cài đặt mạng và thử lại.</string>
+    <string name="no_internet_retry">Thử lại</string>
+
+    <string name="splash_loading">Đang tải…</string>
+    <string name="login_title">Đăng nhập</string>
+    <string name="login_sign_in">Đăng nhập</string>
+    <string name="home_title">Trang chủ</string>
+    <string name="home_open_detail">Mở chi tiết</string>
+    <string name="home_open_profile">Mở hồ sơ</string>
+    <string name="profile_title">Hồ sơ</string>
+    <string name="action_back">Quay lại</string>
+    <string name="detail_title">Chi tiết #%1$s</string>
+</resources>

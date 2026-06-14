@@ -10,7 +10,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.ngoctientnt.template.R
 import com.ngoctientnt.template.app.navigation.LocalAppNavigator
 
 @Composable
@@ -25,14 +27,14 @@ fun DetailScreen(id: String) {
         verticalArrangement = Arrangement.Center,
     ) {
         Text(
-            text = "Detail #$id",
+            text = stringResource(R.string.detail_title, id),
             style = MaterialTheme.typography.headlineMedium,
         )
         Button(
             onClick = navigator::pop,
             modifier = Modifier.padding(top = 16.dp),
         ) {
-            Text("Back")
+            Text(stringResource(R.string.action_back))
         }
     }
 }

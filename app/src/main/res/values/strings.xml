@@ -1,9 +1,32 @@
 <resources>
     <string name="app_name">Template</string>
     <string name="default_notification_channel_id">default_notification_channel</string>
+
+    <!-- Language names are kept in native form and are not translated -->
+    <string name="language_system">System default</string>
+    <string name="language_english">English</string>
+    <string name="language_vietnamese">Tiếng Việt</string>
+
+    <string name="settings_language">Language</string>
+    <string name="language_apply">Apply</string>
+
+    <!-- Notifications -->
     <string name="notification_channel_name">General notifications</string>
     <string name="notification_channel_description">App updates and alerts</string>
+
+    <!-- Connectivity -->
     <string name="no_internet_title">No internet connection</string>
     <string name="no_internet_message">Please check your network settings and try again.</string>
     <string name="no_internet_retry">Retry</string>
+
+    <!-- Screens -->
+    <string name="splash_loading">Loading…</string>
+    <string name="login_title">Login</string>
+    <string name="login_sign_in">Sign in</string>
+    <string name="home_title">Home</string>
+    <string name="home_open_detail">Open Detail</string>
+    <string name="home_open_profile">Open Profile</string>
+    <string name="profile_title">Profile</string>
+    <string name="action_back">Back</string>
+    <string name="detail_title">Detail #%1$s</string>
 </resources>

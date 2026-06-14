@@ -10,6 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.ngoctientnt.template.R
 import com.ngoctientnt.template.app.navigation.HomeRoute
 import com.ngoctientnt.template.app.navigation.LocalAppNavigator
 import kotlinx.coroutines.delay
@@ -31,7 +33,7 @@ fun SplashScreen() {
     ) {
         CircularProgressIndicator()
         Text(
-            text = "Loading...",
+            text = stringResource(R.string.splash_loading),
             style = MaterialTheme.typography.bodyLarge,
         )
     }

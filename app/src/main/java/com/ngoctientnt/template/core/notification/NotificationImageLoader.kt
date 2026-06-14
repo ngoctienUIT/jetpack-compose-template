@@ -7,6 +7,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import androidx.core.graphics.scale
 
 @Singleton
 class NotificationImageLoader @Inject constructor(
@@ -16,7 +17,7 @@ class NotificationImageLoader @Inject constructor(
         val request = Request.Builder().url(url).build()
         okHttpClient.newCall(request).execute().use { response ->
             if (!response.isSuccessful) return null
-            val bytes = response.body?.bytes() ?: return null
+            val bytes = response.body.bytes()
             BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
         }
     }.onFailure { error ->
@@ -32,7 +33,7 @@ class NotificationImageLoader @Inject constructor(
         )
         val width = (bitmap.width * ratio).toInt()
         val height = (bitmap.height * ratio).toInt()
-        return Bitmap.createScaledBitmap(bitmap, width, height, true)
+        return bitmap.scale(width, height)
     }
 
     companion object {

@@ -10,7 +10,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.ngoctientnt.template.R
 import com.ngoctientnt.template.app.navigation.DetailRoute
 import com.ngoctientnt.template.app.navigation.LocalAppNavigator
 import com.ngoctientnt.template.app.navigation.ProfileRoute
@@ -27,20 +29,20 @@ fun HomeScreen() {
         verticalArrangement = Arrangement.Center,
     ) {
         Text(
-            text = "Home",
+            text = stringResource(R.string.home_title),
             style = MaterialTheme.typography.headlineMedium,
         )
         Button(
             onClick = { navigator.navigate(DetailRoute(id = "42")) },
             modifier = Modifier.padding(top = 16.dp),
         ) {
-            Text("Open Detail")
+            Text(stringResource(R.string.home_open_detail))
         }
         Button(
             onClick = { navigator.navigate(ProfileRoute) },
             modifier = Modifier.padding(top = 8.dp),
         ) {
-            Text("Open Profile")
+            Text(stringResource(R.string.home_open_profile))
         }
     }
 }
