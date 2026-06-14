@@ -3,6 +3,7 @@ package com.ngoctientnt.template
 import android.app.Application
 import com.ngoctientnt.template.core.locale.LocaleManager
 import com.ngoctientnt.template.core.notification.NotificationHelper
+import com.ngoctientnt.template.core.theme.ThemeManager
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -17,13 +18,19 @@ class TemplateApplication : Application() {
     @Inject
     lateinit var localeManager: LocaleManager
 
+    @Inject
+    lateinit var themeManager: ThemeManager
+
     override fun onCreate() {
         super.onCreate()
 
-        val storedLanguage = runBlocking(Dispatchers.IO) {
-            localeManager.readStoredLanguage()
+        runBlocking(Dispatchers.IO) {
+            val storedLanguage = localeManager.readStoredLanguage()
+            localeManager.applyLanguage(storedLanguage)
+
+            val storedThemeMode = themeManager.readStoredThemeMode()
+            themeManager.applyThemeMode(storedThemeMode)
         }
-        localeManager.applyLanguage(storedLanguage)
 
         notificationHelper.createNotificationChannel()
     }

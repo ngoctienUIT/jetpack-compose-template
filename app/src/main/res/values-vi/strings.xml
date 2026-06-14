@@ -9,6 +9,13 @@
     <string name="settings_language">Ngôn ngữ</string>
     <string name="language_apply">Xác nhận</string>
 
+    <string name="theme_system">Theo hệ thống</string>
+    <string name="theme_light">Sáng</string>
+    <string name="theme_dark">Tối</string>
+
+    <string name="settings_theme">Giao diện</string>
+    <string name="theme_apply">Xác nhận</string>
+
     <string name="notification_channel_name">Thông báo chung</string>
     <string name="notification_channel_description">Cập nhật và thông báo từ ứng dụng</string>
 

@@ -10,6 +10,14 @@
     <string name="settings_language">Language</string>
     <string name="language_apply">Apply</string>
 
+    <!-- Theme names are kept in native form and are not translated -->
+    <string name="theme_system">System default</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+
+    <string name="settings_theme">Appearance</string>
+    <string name="theme_apply">Apply</string>
+
     <!-- Notifications -->
     <string name="notification_channel_name">General notifications</string>
     <string name="notification_channel_description">App updates and alerts</string>
