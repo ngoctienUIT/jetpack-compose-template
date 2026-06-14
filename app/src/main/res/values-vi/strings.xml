@@ -29,10 +29,15 @@
     <string name="login_password">Mật khẩu</string>
     <string name="login_sign_in">Đăng nhập</string>
     <string name="login_forgot_password">Quên mật khẩu?</string>
+    <string name="login_error_empty_fields">Vui lòng nhập email và mật khẩu.</string>
+    <string name="login_error_failed">Đăng nhập thất bại. Vui lòng thử lại.</string>
+    <string name="login_error_network">Không có kết nối internet. Vui lòng thử lại.</string>
+    <string name="login_error_unknown">Đã xảy ra lỗi. Vui lòng thử lại.</string>
     <string name="home_title">Trang chủ</string>
     <string name="home_open_detail">Mở chi tiết</string>
     <string name="home_open_profile">Mở hồ sơ</string>
     <string name="profile_title">Hồ sơ</string>
+    <string name="profile_logout">Đăng xuất</string>
     <string name="action_back">Quay lại</string>
     <string name="detail_title">Chi tiết #%1$s</string>
 
@@ -44,6 +49,9 @@
 
     <string name="explore_title">Khám phá</string>
     <string name="explore_subtitle">Tìm nội dung mới tại đây.</string>
+    <string name="explore_empty">Chưa có nội dung để khám phá.</string>
+    <string name="explore_error">Không thể tải danh sách khám phá.</string>
+    <string name="explore_retry">Thử lại</string>
     <string name="explore_sample_image">Ảnh mẫu khám phá</string>
     <string name="activity_title">Hoạt động</string>
     <string name="activity_subtitle">Thông báo và cập nhật gần đây.</string>

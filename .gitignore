@@ -16,6 +16,8 @@ local.properties
 
 # Signing — copy from secrets/signing.properties.example
 secrets/signing.properties
+secrets/env.staging.properties
+secrets/env.production.properties
 secrets/*.jks
 secrets/*.keystore
 

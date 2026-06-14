@@ -23,7 +23,7 @@ object ImageModule {
     @Singleton
     fun provideImageLoader(
         @ApplicationContext context: Context,
-        okHttpClient: OkHttpClient,
+        @PublicOkHttpClient okHttpClient: OkHttpClient,
         config: AppImageLoaderConfig,
     ): ImageLoader {
         return ImageLoader.Builder(context)

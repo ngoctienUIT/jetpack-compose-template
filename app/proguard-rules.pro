@@ -64,6 +64,16 @@
 # --- App models & navigation routes ---
 -keep class com.ngoctientnt.template.app.navigation.** { *; }
 -keep class com.ngoctientnt.template.core.appinfo.model.** { *; }
+-keep class com.ngoctientnt.template.core.network.dto.** { *; }
+-keep class com.ngoctientnt.template.core.network.paging.dto.** { *; }
+-keep class com.ngoctientnt.template.feature.explore.data.remote.dto.** { *; }
+-keep class * extends androidx.paging.PagingSource { *; }
+-keep class com.ngoctientnt.template.core.auth.data.remote.dto.** { *; }
+-keep class com.ngoctientnt.template.core.auth.domain.model.** { *; }
+
+# --- Security Crypto ---
+-keep class androidx.security.crypto.** { *; }
+-dontwarn androidx.security.crypto.**
 
 # --- Window extensions (Compose / Activity) ---
 -dontwarn androidx.window.**

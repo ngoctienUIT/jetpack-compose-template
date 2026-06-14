@@ -3,6 +3,7 @@ package com.ngoctientnt.template.core.notification
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
+import com.ngoctientnt.template.di.PublicOkHttpClient
 import javax.inject.Inject
 import javax.inject.Singleton
 import okhttp3.OkHttpClient
@@ -11,7 +12,7 @@ import androidx.core.graphics.scale
 
 @Singleton
 class NotificationImageLoader @Inject constructor(
-    private val okHttpClient: OkHttpClient,
+    @PublicOkHttpClient private val okHttpClient: OkHttpClient,
 ) {
     fun load(url: String): Bitmap? = runCatching {
         val request = Request.Builder().url(url).build()

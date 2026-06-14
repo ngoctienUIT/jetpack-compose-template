@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.firebase.performance)
@@ -8,12 +10,72 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-import java.util.Properties
-
 val signingPropertiesFile = rootProject.file("secrets/signing.properties")
 val signingProperties = Properties().apply {
     if (signingPropertiesFile.exists()) {
         signingPropertiesFile.inputStream().use { load(it) }
+    }
+}
+
+fun loadEnvProperties(flavorName: String): Properties {
+    val envFile = rootProject.file("secrets/env.$flavorName.properties")
+    val exampleFile = rootProject.file("secrets/env.$flavorName.properties.example")
+
+    val fileToLoad = when {
+        envFile.exists() -> envFile
+        exampleFile.exists() -> {
+            logger.warn(
+                "secrets/env.$flavorName.properties not found — " +
+                    "using secrets/env.$flavorName.properties.example defaults",
+            )
+            exampleFile
+        }
+        else -> error(
+            "Missing secrets/env.$flavorName.properties. " +
+                "Copy secrets/env.$flavorName.properties.example and fill in your values.",
+        )
+    }
+
+    return Properties().apply {
+        fileToLoad.inputStream().use { load(it) }
+    }
+}
+
+fun Properties.requireEnvProperty(key: String, flavorName: String): String {
+    return getProperty(key)?.trim()?.takeIf { it.isNotEmpty() }
+        ?: error("Missing '$key' in secrets/env.$flavorName.properties")
+}
+
+fun String.toBuildConfigString(): String = "\"${replace("\\", "\\\\").replace("\"", "\\\"")}\""
+
+private val envPropertiesCache = mutableMapOf<String, Properties>()
+
+fun resolveActiveFlavors(): Set<String>? {
+    val taskNames = gradle.startParameter.taskNames
+    if (taskNames.isEmpty()) return null
+
+    val flavors = mutableSetOf<String>()
+    for (task in taskNames) {
+        val normalized = task.substringAfterLast(':').lowercase()
+        when {
+            "staging" in normalized -> flavors.add("staging")
+            "production" in normalized -> flavors.add("production")
+        }
+    }
+    // Tasks like `build` or `clean` don't name a flavor — load all env files.
+    return flavors.takeIf { it.isNotEmpty() }
+}
+
+fun envForFlavor(flavorName: String): Properties {
+    return envPropertiesCache.getOrPut(flavorName) {
+        val activeFlavors = resolveActiveFlavors()
+        if (activeFlavors != null && flavorName !in activeFlavors) {
+            Properties().apply {
+                setProperty("API_BASE_URL", "https://unused.local/")
+            }
+        } else {
+            loadEnvProperties(flavorName)
+        }
     }
 }
 
@@ -56,13 +118,21 @@ android {
             versionNameSuffix = "-staging"
             resValue("string", "app_name", "Template Staging")
             buildConfigField("String", "ENVIRONMENT", "\"staging\"")
-            buildConfigField("String", "API_BASE_URL", "\"https://staging.example.com/\"")
+            buildConfigField(
+                "String",
+                "API_BASE_URL",
+                envForFlavor("staging").requireEnvProperty("API_BASE_URL", "staging").toBuildConfigString(),
+            )
         }
         create("production") {
             dimension = "environment"
             resValue("string", "app_name", "Template")
             buildConfigField("String", "ENVIRONMENT", "\"production\"")
-            buildConfigField("String", "API_BASE_URL", "\"https://api.example.com/\"")
+            buildConfigField(
+                "String",
+                "API_BASE_URL",
+                envForFlavor("production").requireEnvProperty("API_BASE_URL", "production").toBuildConfigString(),
+            )
         }
     }
 
@@ -142,6 +212,7 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.security.crypto)
 
     implementation(libs.coil.compose)
 

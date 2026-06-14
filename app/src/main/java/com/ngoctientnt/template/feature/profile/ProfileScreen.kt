@@ -22,12 +22,15 @@ import com.ngoctientnt.template.feature.locale.LocaleViewModel
 import com.ngoctientnt.template.feature.theme.ThemeViewModel
 import com.ngoctientnt.template.ui.component.LanguageSelector
 import com.ngoctientnt.template.ui.component.ThemeSelector
+import com.ngoctientnt.template.ui.component.button.AppOutlinedButton
 
 @Composable
 fun ProfileScreen(
+    profileViewModel: ProfileViewModel = hiltViewModel(),
     localeViewModel: LocaleViewModel = hiltViewModel(),
     themeViewModel: ThemeViewModel = hiltViewModel(),
 ) {
+    val isLoggingOut by profileViewModel.isLoggingOut.collectAsStateWithLifecycle()
     val pendingLanguage by localeViewModel.pendingLanguage.collectAsStateWithLifecycle()
     val canApplyLanguage by localeViewModel.canApplyLanguage.collectAsStateWithLifecycle()
     val pendingThemeMode by themeViewModel.pendingThemeMode.collectAsStateWithLifecycle()
@@ -64,6 +67,17 @@ fun ProfileScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 24.dp),
+        )
+
+        AppOutlinedButton(
+            text = stringResource(R.string.profile_logout),
+            onClick = profileViewModel::logout,
+            enabled = !isLoggingOut,
+            loading = isLoggingOut,
+            fullWidth = true,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 32.dp),
         )
     }
 }
