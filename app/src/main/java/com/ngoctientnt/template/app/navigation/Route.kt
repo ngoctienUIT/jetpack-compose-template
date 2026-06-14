@@ -9,12 +9,14 @@ data object SplashRoute
 data object LoginRoute
 
 @Serializable
-data object HomeRoute
-
-@Serializable
-data class DetailRoute(
-    val id: String
+data class MainRoute(
+    val tab: String = BottomNavTab.HOME.name,
 )
 
 @Serializable
-data object ProfileRoute
+data class DetailRoute(
+    val id: String,
+)
+
+@Serializable
+data object FavoriteRoute

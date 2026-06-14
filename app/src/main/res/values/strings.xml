@@ -37,4 +37,18 @@
     <string name="profile_title">Profile</string>
     <string name="action_back">Back</string>
     <string name="detail_title">Detail #%1$s</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_explore">Explore</string>
+    <string name="nav_activity">Activity</string>
+    <string name="nav_profile">Profile</string>
+    <string name="nav_favorite">Favorites</string>
+
+    <string name="explore_title">Explore</string>
+    <string name="explore_subtitle">Discover new content here.</string>
+    <string name="activity_title">Activity</string>
+    <string name="activity_subtitle">Your recent notifications and updates.</string>
+    <string name="favorite_title">Favorites</string>
+    <string name="favorite_subtitle">Quick access to your saved items.</string>
 </resources>

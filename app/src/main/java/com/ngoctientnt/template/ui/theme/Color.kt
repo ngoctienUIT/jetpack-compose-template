@@ -2,12 +2,10 @@ package com.ngoctientnt.template.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Brand seed
 val BluePrimary = Color(0xFF0061A4)
 val BluePrimaryDark = Color(0xFF9ECAFF)
 val BlueOnPrimaryDark = Color(0xFF003258)
 
-// Light scheme
 val LightPrimary = Color(0xFF0061A4)
 val LightOnPrimary = Color(0xFFFFFFFF)
 val LightPrimaryContainer = Color(0xFFD1E4FF)
@@ -37,7 +35,6 @@ val LightOnSurfaceVariant = Color(0xFF43474E)
 val LightOutline = Color(0xFF73777F)
 val LightOutlineVariant = Color(0xFFC3C6CF)
 
-// Dark scheme
 val DarkPrimary = Color(0xFF9ECAFF)
 val DarkOnPrimary = Color(0xFF003258)
 val DarkPrimaryContainer = Color(0xFF00497D)

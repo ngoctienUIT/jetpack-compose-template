@@ -1,10 +1,9 @@
-package com.ngoctientnt.template.feature.home
+package com.ngoctientnt.template.feature.activity
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -13,13 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ngoctientnt.template.R
-import com.ngoctientnt.template.app.navigation.DetailRoute
-import com.ngoctientnt.template.app.navigation.LocalAppNavigator
 
 @Composable
-fun HomeScreen() {
-    val navigator = LocalAppNavigator.current
-
+fun ActivityScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -28,14 +23,14 @@ fun HomeScreen() {
         verticalArrangement = Arrangement.Center,
     ) {
         Text(
-            text = stringResource(R.string.home_title),
+            text = stringResource(R.string.activity_title),
             style = MaterialTheme.typography.headlineMedium,
         )
-        Button(
-            onClick = { navigator.navigate(DetailRoute(id = "42")) },
-            modifier = Modifier.padding(top = 16.dp),
-        ) {
-            Text(stringResource(R.string.home_open_detail))
-        }
+        Text(
+            text = stringResource(R.string.activity_subtitle),
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(top = 8.dp),
+        )
     }
 }
+

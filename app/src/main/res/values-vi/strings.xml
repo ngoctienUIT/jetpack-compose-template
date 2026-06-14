@@ -32,4 +32,17 @@
     <string name="profile_title">Hồ sơ</string>
     <string name="action_back">Quay lại</string>
     <string name="detail_title">Chi tiết #%1$s</string>
+
+    <string name="nav_home">Trang chủ</string>
+    <string name="nav_explore">Khám phá</string>
+    <string name="nav_activity">Hoạt động</string>
+    <string name="nav_profile">Hồ sơ</string>
+    <string name="nav_favorite">Yêu thích</string>
+
+    <string name="explore_title">Khám phá</string>
+    <string name="explore_subtitle">Tìm nội dung mới tại đây.</string>
+    <string name="activity_title">Hoạt động</string>
+    <string name="activity_subtitle">Thông báo và cập nhật gần đây.</string>
+    <string name="favorite_title">Yêu thích</string>
+    <string name="favorite_subtitle">Truy cập nhanh các mục đã lưu.</string>
 </resources>

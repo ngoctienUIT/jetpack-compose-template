@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ngoctientnt.template.R
-import com.ngoctientnt.template.app.navigation.HomeRoute
+import com.ngoctientnt.template.app.navigation.MainRoute
 import com.ngoctientnt.template.app.navigation.LocalAppNavigator
 
 @Composable
@@ -32,7 +32,7 @@ fun LoginScreen() {
             style = MaterialTheme.typography.headlineMedium,
         )
         Button(
-            onClick = { navigator.replaceAll(HomeRoute) },
+            onClick = { navigator.replaceAll(MainRoute()) },
             modifier = Modifier.padding(top = 16.dp),
         ) {
             Text(stringResource(R.string.login_sign_in))

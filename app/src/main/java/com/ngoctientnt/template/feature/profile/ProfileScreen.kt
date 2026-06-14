@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,7 +18,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ngoctientnt.template.R
-import com.ngoctientnt.template.app.navigation.LocalAppNavigator
 import com.ngoctientnt.template.feature.locale.LocaleViewModel
 import com.ngoctientnt.template.feature.theme.ThemeViewModel
 import com.ngoctientnt.template.ui.component.LanguageSelector
@@ -30,7 +28,6 @@ fun ProfileScreen(
     localeViewModel: LocaleViewModel = hiltViewModel(),
     themeViewModel: ThemeViewModel = hiltViewModel(),
 ) {
-    val navigator = LocalAppNavigator.current
     val pendingLanguage by localeViewModel.pendingLanguage.collectAsStateWithLifecycle()
     val canApplyLanguage by localeViewModel.canApplyLanguage.collectAsStateWithLifecycle()
     val pendingThemeMode by themeViewModel.pendingThemeMode.collectAsStateWithLifecycle()
@@ -68,12 +65,5 @@ fun ProfileScreen(
                 .fillMaxWidth()
                 .padding(top = 24.dp),
         )
-
-        Button(
-            onClick = navigator::pop,
-            modifier = Modifier.padding(top = 24.dp),
-        ) {
-            Text(stringResource(R.string.action_back))
-        }
     }
 }
