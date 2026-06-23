@@ -1,13 +1,14 @@
-package com.ngoctientnt.template.feature.login
+package com.ngoctientnt.template.feature.signup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ngoctientnt.template.core.auth.domain.model.SocialAuthIntent
 import com.ngoctientnt.template.core.auth.domain.model.SocialIdentity
 import com.ngoctientnt.template.core.auth.domain.model.SocialProvider
-import com.ngoctientnt.template.core.auth.domain.usecase.LoginUseCase
+import com.ngoctientnt.template.core.auth.domain.usecase.RegisterUseCase
 import com.ngoctientnt.template.core.auth.domain.usecase.SocialAuthUseCase
 import com.ngoctientnt.template.core.auth.social.SocialAuthGateway
+import com.ngoctientnt.template.core.config.AppConfig
 import com.ngoctientnt.template.core.network.result.handleResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -20,54 +21,76 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(
-    private val loginUseCase: LoginUseCase,
+class SignUpViewModel @Inject constructor(
+    private val registerUseCase: RegisterUseCase,
     private val socialAuthUseCase: SocialAuthUseCase,
     socialAuthGateway: SocialAuthGateway,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
-        LoginUiState(
+        SignUpUiState(
             isGoogleEnabled = socialAuthGateway.isProviderConfigured(SocialProvider.GOOGLE),
             isFacebookEnabled = socialAuthGateway.isProviderConfigured(SocialProvider.FACEBOOK),
         ),
     )
-    val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
+    val uiState: StateFlow<SignUpUiState> = _uiState.asStateFlow()
 
-    private val _effect = Channel<LoginEffect>(Channel.BUFFERED)
+    private val _effect = Channel<SignUpEffect>(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
 
-    fun onIntent(intent: LoginIntent) {
+    fun onIntent(intent: SignUpIntent) {
         when (intent) {
-            is LoginIntent.EmailChanged -> reduce { copy(email = intent.value, errorMessage = null) }
-            is LoginIntent.PasswordChanged -> reduce { copy(password = intent.value, errorMessage = null) }
-            LoginIntent.SignInClicked -> signIn()
-            LoginIntent.GoogleSignInClicked -> launchSocialAuth(SocialProvider.GOOGLE)
-            LoginIntent.FacebookSignInClicked -> launchSocialAuth(SocialProvider.FACEBOOK)
-            is LoginIntent.SocialAuthCompleted -> completeSocialAuth(intent.identity)
-            is LoginIntent.SocialAuthFailed -> handleSocialAuthFailed(intent.errorCode)
-            LoginIntent.NavigateToSignUpClicked -> navigateToSignUp()
+            is SignUpIntent.DisplayNameChanged ->
+                reduce { copy(displayName = intent.value, errorMessage = null) }
+            is SignUpIntent.EmailChanged ->
+                reduce { copy(email = intent.value, errorMessage = null) }
+            is SignUpIntent.PasswordChanged ->
+                reduce { copy(password = intent.value, errorMessage = null) }
+            is SignUpIntent.ConfirmPasswordChanged ->
+                reduce { copy(confirmPassword = intent.value, errorMessage = null) }
+            SignUpIntent.SignUpClicked -> signUpWithEmail()
+            SignUpIntent.GoogleSignInClicked -> launchSocialAuth(SocialProvider.GOOGLE)
+            SignUpIntent.FacebookSignInClicked -> launchSocialAuth(SocialProvider.FACEBOOK)
+            is SignUpIntent.SocialAuthCompleted -> completeSocialAuth(intent.identity)
+            is SignUpIntent.SocialAuthFailed -> handleSocialAuthFailed(intent.errorCode)
+            SignUpIntent.NavigateToLoginClicked -> navigateToLogin()
         }
     }
 
-    private fun signIn() {
+    private fun signUpWithEmail() {
         val currentState = _uiState.value
         if (currentState.isLoading || currentState.socialLoadingProvider != null) return
 
+        val displayName = currentState.displayName.trim()
         val email = currentState.email.trim()
         val password = currentState.password
+        val confirmPassword = currentState.confirmPassword
 
-        if (email.isBlank() || password.isBlank()) {
-            reduce { copy(errorMessage = LoginErrors.EMPTY_FIELDS) }
+        if (displayName.isBlank() || email.isBlank() || password.isBlank() || confirmPassword.isBlank()) {
+            reduce { copy(errorMessage = SignUpErrors.EMPTY_FIELDS) }
+            return
+        }
+
+        if (password.length < AppConfig.MIN_PASSWORD_LENGTH) {
+            reduce { copy(errorMessage = SignUpErrors.PASSWORD_TOO_SHORT) }
+            return
+        }
+
+        if (password != confirmPassword) {
+            reduce { copy(errorMessage = SignUpErrors.PASSWORD_MISMATCH) }
             return
         }
 
         viewModelScope.launch {
             reduce { copy(isLoading = true, errorMessage = null) }
-            loginUseCase(email, password).handleResult(
+            registerUseCase(
+                email = email,
+                password = password,
+                displayName = displayName,
+            ).handleResult(
                 onSuccess = {
                     reduce { copy(isLoading = false) }
-                    _effect.send(LoginEffect.NavigateToMain)
+                    _effect.send(SignUpEffect.NavigateToMain)
                 },
                 onError = { errorMessage ->
                     reduce { copy(isLoading = false, errorMessage = errorMessage) }
@@ -89,8 +112,8 @@ class LoginViewModel @Inject constructor(
         reduce { copy(socialLoadingProvider = provider, errorMessage = null) }
         viewModelScope.launch {
             val effect = when (provider) {
-                SocialProvider.GOOGLE -> LoginEffect.LaunchGoogleSignIn
-                SocialProvider.FACEBOOK -> LoginEffect.LaunchFacebookSignIn
+                SocialProvider.GOOGLE -> SignUpEffect.LaunchGoogleSignIn
+                SocialProvider.FACEBOOK -> SignUpEffect.LaunchFacebookSignIn
             }
             _effect.send(effect)
         }
@@ -100,11 +123,11 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             socialAuthUseCase(
                 identity = identity,
-                intent = SocialAuthIntent.LOGIN,
+                intent = SocialAuthIntent.SIGN_UP,
             ).handleResult(
                 onSuccess = {
                     reduce { copy(socialLoadingProvider = null) }
-                    _effect.send(LoginEffect.NavigateToMain)
+                    _effect.send(SignUpEffect.NavigateToMain)
                 },
                 onError = { errorMessage ->
                     reduce {
@@ -127,13 +150,13 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    private fun navigateToSignUp() {
+    private fun navigateToLogin() {
         viewModelScope.launch {
-            _effect.send(LoginEffect.NavigateToSignUp)
+            _effect.send(SignUpEffect.NavigateToLogin)
         }
     }
 
-    private inline fun reduce(block: LoginUiState.() -> LoginUiState) {
+    private inline fun reduce(block: SignUpUiState.() -> SignUpUiState) {
         _uiState.update(block)
     }
 }

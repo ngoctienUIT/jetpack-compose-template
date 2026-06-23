@@ -3,6 +3,7 @@ package com.ngoctientnt.template.di
 import com.ngoctientnt.template.BuildConfig
 import com.ngoctientnt.template.core.appinfo.config.AppInfoConfig
 import com.ngoctientnt.template.core.config.NetworkConfig
+import com.ngoctientnt.template.core.config.SocialAuthConfig
 import com.ngoctientnt.template.ui.component.image.AppImageLoaderConfig
 import dagger.Module
 import dagger.Provides
@@ -40,5 +41,13 @@ object ConfigModule {
         memoryCacheMaxSizePercent = 0.25,
         diskCacheMaxSizePercent = 0.02,
         diskCacheDirectoryName = com.ngoctientnt.template.core.config.AppConfig.IMAGE_DISK_CACHE_DIR,
+    )
+
+    @Provides
+    @Singleton
+    fun provideSocialAuthConfig(): SocialAuthConfig = SocialAuthConfig(
+        googleWebClientId = BuildConfig.GOOGLE_WEB_CLIENT_ID,
+        facebookAppId = BuildConfig.FACEBOOK_APP_ID,
+        facebookClientToken = BuildConfig.FACEBOOK_CLIENT_TOKEN,
     )
 }

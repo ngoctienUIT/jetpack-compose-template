@@ -10,6 +10,7 @@ import com.ngoctientnt.template.feature.detail.DetailScreen
 import com.ngoctientnt.template.feature.favorite.FavoriteScreen
 import com.ngoctientnt.template.feature.login.LoginScreen
 import com.ngoctientnt.template.feature.main.MainScreen
+import com.ngoctientnt.template.feature.signup.SignUpScreen
 import com.ngoctientnt.template.feature.splash.SplashScreen
 
 @Composable
@@ -37,6 +38,10 @@ fun AppNavHost(
 
                 entry<LoginRoute> {
                     LoginScreen()
+                }
+
+                entry<SignUpRoute> {
+                    SignUpScreen()
                 }
 
                 entry<MainRoute> { route ->

@@ -61,6 +61,17 @@
 -keep class com.google.firebase.** { *; }
 -dontwarn com.google.firebase.**
 
+# --- Google Identity / Credential Manager ---
+-keep class com.google.android.libraries.identity.** { *; }
+-dontwarn com.google.android.libraries.identity.**
+-keep class androidx.credentials.** { *; }
+-dontwarn androidx.credentials.**
+
+# --- Facebook SDK ---
+-keep class com.facebook.** { *; }
+-dontwarn com.facebook.**
+-keepattributes Signature
+
 # --- App models & navigation routes ---
 -keep class com.ngoctientnt.template.app.navigation.** { *; }
 -keep class com.ngoctientnt.template.core.appinfo.model.** { *; }

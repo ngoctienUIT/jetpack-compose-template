@@ -10,6 +10,9 @@ data object SplashRoute : NavKey
 data object LoginRoute : NavKey
 
 @Serializable
+data object SignUpRoute : NavKey
+
+@Serializable
 data class MainRoute(
     val tab: String = BottomNavTab.HOME.name,
 ) : NavKey

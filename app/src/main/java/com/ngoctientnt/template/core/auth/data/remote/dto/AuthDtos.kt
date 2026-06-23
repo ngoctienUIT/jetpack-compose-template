@@ -10,6 +10,24 @@ data class LoginRequestDto(
 )
 
 @Serializable
+data class RegisterRequestDto(
+    val email: String,
+    val password: String,
+    @SerialName("displayName")
+    val displayName: String? = null,
+)
+
+@Serializable
+data class SocialAuthRequestDto(
+    val provider: String,
+    @SerialName("idToken")
+    val idToken: String? = null,
+    @SerialName("accessToken")
+    val accessToken: String? = null,
+    val intent: String,
+)
+
+@Serializable
 data class RefreshTokenRequestDto(
     @SerialName("refreshToken")
     val refreshToken: String,

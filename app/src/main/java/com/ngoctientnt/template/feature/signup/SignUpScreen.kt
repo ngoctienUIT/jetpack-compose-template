@@ -1,4 +1,4 @@
-package com.ngoctientnt.template.feature.login
+package com.ngoctientnt.template.feature.signup
 
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Arrangement
@@ -24,10 +24,11 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ngoctientnt.template.R
 import com.ngoctientnt.template.app.navigation.LocalAppNavigator
+import com.ngoctientnt.template.app.navigation.LoginRoute
 import com.ngoctientnt.template.app.navigation.MainRoute
-import com.ngoctientnt.template.app.navigation.SignUpRoute
 import com.ngoctientnt.template.core.auth.domain.model.SocialIdentity
 import com.ngoctientnt.template.core.auth.domain.model.SocialProvider
+import com.ngoctientnt.template.core.config.AppConfig
 import com.ngoctientnt.template.di.SocialAuthLauncherEntryPoint
 import com.ngoctientnt.template.ui.component.auth.SocialAuthErrorCodes
 import com.ngoctientnt.template.ui.component.auth.SocialAuthLaunchResult
@@ -41,8 +42,8 @@ import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.launch
 
 @Composable
-fun LoginScreen(
-    viewModel: LoginViewModel = hiltViewModel(),
+fun SignUpScreen(
+    viewModel: SignUpViewModel = hiltViewModel(),
 ) {
     val navigator = LocalAppNavigator.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -57,9 +58,9 @@ fun LoginScreen(
     LaunchedEffect(viewModel) {
         viewModel.effect.collect { effect ->
             when (effect) {
-                LoginEffect.NavigateToMain -> navigator.replaceAll(MainRoute())
-                LoginEffect.NavigateToSignUp -> navigator.navigate(SignUpRoute)
-                LoginEffect.LaunchGoogleSignIn -> {
+                SignUpEffect.NavigateToMain -> navigator.replaceAll(MainRoute())
+                SignUpEffect.NavigateToLogin -> navigator.replace(LoginRoute)
+                SignUpEffect.LaunchGoogleSignIn -> {
                     if (activity == null) return@collect
                     coroutineScope.launch {
                         handleSocialAuthResult(
@@ -67,12 +68,12 @@ fun LoginScreen(
                                 provider = SocialProvider.GOOGLE,
                                 activity = activity,
                             ),
-                            onCompleted = { viewModel.onIntent(LoginIntent.SocialAuthCompleted(it)) },
-                            onFailed = { viewModel.onIntent(LoginIntent.SocialAuthFailed(it)) },
+                            onCompleted = { viewModel.onIntent(SignUpIntent.SocialAuthCompleted(it)) },
+                            onFailed = { viewModel.onIntent(SignUpIntent.SocialAuthFailed(it)) },
                         )
                     }
                 }
-                LoginEffect.LaunchFacebookSignIn -> {
+                SignUpEffect.LaunchFacebookSignIn -> {
                     if (activity == null) return@collect
                     coroutineScope.launch {
                         handleSocialAuthResult(
@@ -80,8 +81,8 @@ fun LoginScreen(
                                 provider = SocialProvider.FACEBOOK,
                                 activity = activity,
                             ),
-                            onCompleted = { viewModel.onIntent(LoginIntent.SocialAuthCompleted(it)) },
-                            onFailed = { viewModel.onIntent(LoginIntent.SocialAuthFailed(it)) },
+                            onCompleted = { viewModel.onIntent(SignUpIntent.SocialAuthCompleted(it)) },
+                            onFailed = { viewModel.onIntent(SignUpIntent.SocialAuthFailed(it)) },
                         )
                     }
                 }
@@ -98,23 +99,42 @@ fun LoginScreen(
         verticalArrangement = Arrangement.Center,
     ) {
         Text(
-            text = stringResource(R.string.login_title),
+            text = stringResource(R.string.signup_title),
             style = MaterialTheme.typography.headlineMedium,
         )
 
         AppTextField(
-            value = uiState.email,
-            onValueChange = { viewModel.onIntent(LoginIntent.EmailChanged(it)) },
-            label = stringResource(R.string.login_email),
+            value = uiState.displayName,
+            onValueChange = { viewModel.onIntent(SignUpIntent.DisplayNameChanged(it)) },
+            label = stringResource(R.string.signup_display_name),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 24.dp),
         )
 
         AppTextField(
+            value = uiState.email,
+            onValueChange = { viewModel.onIntent(SignUpIntent.EmailChanged(it)) },
+            label = stringResource(R.string.login_email),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp),
+        )
+
+        AppTextField(
             value = uiState.password,
-            onValueChange = { viewModel.onIntent(LoginIntent.PasswordChanged(it)) },
+            onValueChange = { viewModel.onIntent(SignUpIntent.PasswordChanged(it)) },
             label = stringResource(R.string.login_password),
+            visualTransformation = PasswordVisualTransformation(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp),
+        )
+
+        AppTextField(
+            value = uiState.confirmPassword,
+            onValueChange = { viewModel.onIntent(SignUpIntent.ConfirmPasswordChanged(it)) },
+            label = stringResource(R.string.signup_confirm_password),
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier
                 .fillMaxWidth()
@@ -123,7 +143,7 @@ fun LoginScreen(
 
         uiState.errorMessage?.let { errorMessage ->
             Text(
-                text = resolveLoginErrorMessage(errorMessage),
+                text = resolveSignUpErrorMessage(errorMessage),
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(top = 8.dp),
@@ -131,32 +151,26 @@ fun LoginScreen(
         }
 
         AppFilledButton(
-            text = stringResource(R.string.login_sign_in),
-            onClick = { viewModel.onIntent(LoginIntent.SignInClicked) },
+            text = stringResource(R.string.signup_create_account),
+            onClick = { viewModel.onIntent(SignUpIntent.SignUpClicked) },
             enabled = !uiState.isLoading && uiState.socialLoadingProvider == null,
             loading = uiState.isLoading,
             fullWidth = true,
             modifier = Modifier.padding(top = 24.dp),
         )
 
-        AppTextButton(
-            text = stringResource(R.string.login_forgot_password),
-            onClick = { },
-            modifier = Modifier.padding(top = 8.dp),
-        )
-
         SocialSignInSection(
             isGoogleEnabled = uiState.isGoogleEnabled,
             isFacebookEnabled = uiState.isFacebookEnabled,
             loadingProvider = uiState.socialLoadingProvider,
-            onGoogleClick = { viewModel.onIntent(LoginIntent.GoogleSignInClicked) },
-            onFacebookClick = { viewModel.onIntent(LoginIntent.FacebookSignInClicked) },
+            onGoogleClick = { viewModel.onIntent(SignUpIntent.GoogleSignInClicked) },
+            onFacebookClick = { viewModel.onIntent(SignUpIntent.FacebookSignInClicked) },
             modifier = Modifier.padding(top = 24.dp),
         )
 
         AppTextButton(
-            text = stringResource(R.string.login_no_account),
-            onClick = { viewModel.onIntent(LoginIntent.NavigateToSignUpClicked) },
+            text = stringResource(R.string.signup_already_have_account),
+            onClick = { viewModel.onIntent(SignUpIntent.NavigateToLoginClicked) },
             modifier = Modifier.padding(top = 8.dp),
         )
     }
@@ -175,9 +189,12 @@ private fun handleSocialAuthResult(
 }
 
 @Composable
-private fun resolveLoginErrorMessage(errorMessage: String): String {
+private fun resolveSignUpErrorMessage(errorMessage: String): String {
     return when (errorMessage) {
-        LoginErrors.EMPTY_FIELDS -> stringResource(R.string.login_error_empty_fields)
+        SignUpErrors.EMPTY_FIELDS -> stringResource(R.string.signup_error_empty_fields)
+        SignUpErrors.PASSWORD_MISMATCH -> stringResource(R.string.signup_error_password_mismatch)
+        SignUpErrors.PASSWORD_TOO_SHORT ->
+            stringResource(R.string.signup_error_password_too_short, AppConfig.MIN_PASSWORD_LENGTH)
         SocialAuthErrorCodes.NOT_CONFIGURED,
         SocialAuthErrorCodes.FAILED,
         -> resolveSocialAuthErrorMessage(errorMessage)

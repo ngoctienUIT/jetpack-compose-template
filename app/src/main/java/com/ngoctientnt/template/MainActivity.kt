@@ -18,6 +18,7 @@ import com.ngoctientnt.template.app.App
 import com.ngoctientnt.template.app.navigation.AppBackStack
 import com.ngoctientnt.template.app.navigation.AppNavigator
 import com.ngoctientnt.template.core.appinfo.AppInfoManager
+import com.ngoctientnt.template.core.auth.social.FacebookAuthCallbackRegistrar
 import com.ngoctientnt.template.core.notification.FcmTokenManager
 import com.ngoctientnt.template.core.notification.NotificationRouteHandler
 import com.ngoctientnt.template.feature.theme.ThemeViewModel
@@ -43,12 +44,16 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var appInfoManager: AppInfoManager
 
+    @Inject
+    lateinit var facebookAuthCallbackRegistrar: FacebookAuthCallbackRegistrar
+
     private val notificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { /* Permission result is handled by the system notification settings. */ }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        facebookAuthCallbackRegistrar.register(this)
         enableEdgeToEdge()
         requestNotificationPermissionIfNeeded()
         fetchFcmToken()

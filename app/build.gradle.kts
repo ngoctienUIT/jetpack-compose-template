@@ -20,19 +20,17 @@ val signingProperties = Properties().apply {
 fun loadEnvProperties(flavorName: String): Properties {
     val envFile = rootProject.file("secrets/env.$flavorName.properties")
     val exampleFile = rootProject.file("secrets/env.$flavorName.properties.example")
-
-    val fileToLoad = when {
-        envFile.exists() -> envFile
-        exampleFile.exists() -> {
-            logger.warn(
-                "secrets/env.$flavorName.properties not found — " +
-                    "using secrets/env.$flavorName.properties.example defaults",
-            )
-            exampleFile
-        }
-        else -> error(
+    val fileToLoad = envFile.takeIf { it.exists() }
+        ?: exampleFile.takeIf { it.exists() }
+        ?: error(
             "Missing secrets/env.$flavorName.properties. " +
                 "Copy secrets/env.$flavorName.properties.example and fill in your values.",
+        )
+
+    if (!envFile.exists()) {
+        logger.warn(
+            "secrets/env.$flavorName.properties not found — " +
+                "using secrets/env.$flavorName.properties.example defaults",
         )
     }
 
@@ -41,42 +39,90 @@ fun loadEnvProperties(flavorName: String): Properties {
     }
 }
 
-fun Properties.requireEnvProperty(key: String, flavorName: String): String {
-    return getProperty(key)?.trim()?.takeIf { it.isNotEmpty() }
-        ?: error("Missing '$key' in secrets/env.$flavorName.properties")
-}
-
 fun String.toBuildConfigString(): String = "\"${replace("\\", "\\\\").replace("\"", "\\\"")}\""
 
-private val envPropertiesCache = mutableMapOf<String, Properties>()
+data class EnvConfig(
+    val apiBaseUrl: String,
+    val googleWebClientId: String,
+    val facebookAppId: String,
+    val facebookClientToken: String,
+) {
+    val facebookAppIdRes: String get() = facebookAppId.ifBlank { "0" }
+    val facebookClientTokenRes: String get() = facebookClientToken.ifBlank { "0" }
+    val fbLoginProtocolScheme: String get() = "fb$facebookAppIdRes"
 
-fun resolveActiveFlavors(): Set<String>? {
-    val taskNames = gradle.startParameter.taskNames
-    if (taskNames.isEmpty()) return null
-
-    val flavors = mutableSetOf<String>()
-    for (task in taskNames) {
-        val normalized = task.substringAfterLast(':').lowercase()
-        when {
-            "staging" in normalized -> flavors.add("staging")
-            "production" in normalized -> flavors.add("production")
-        }
+    companion object {
+        fun placeholder() = EnvConfig(
+            apiBaseUrl = "https://unused.local/",
+            googleWebClientId = "",
+            facebookAppId = "",
+            facebookClientToken = "",
+        )
     }
-    // Tasks like `build` or `clean` don't name a flavor — load all env files.
-    return flavors.takeIf { it.isNotEmpty() }
 }
 
-fun envForFlavor(flavorName: String): Properties {
-    return envPropertiesCache.getOrPut(flavorName) {
-        val activeFlavors = resolveActiveFlavors()
-        if (activeFlavors != null && flavorName !in activeFlavors) {
-            Properties().apply {
-                setProperty("API_BASE_URL", "https://unused.local/")
-            }
-        } else {
-            loadEnvProperties(flavorName)
+fun envConfig(flavorName: String): EnvConfig {
+    val props = loadEnvProperties(flavorName)
+    fun optional(key: String, default: String = ""): String {
+        return props.getProperty(key)?.trim()?.takeIf { it.isNotEmpty() } ?: default
+    }
+    fun required(key: String): String {
+        return optional(key).ifEmpty {
+            error("Missing '$key' in secrets/env.$flavorName.properties")
         }
     }
+
+    return EnvConfig(
+        apiBaseUrl = required("API_BASE_URL"),
+        googleWebClientId = optional("GOOGLE_WEB_CLIENT_ID"),
+        facebookAppId = optional("FACEBOOK_APP_ID"),
+        facebookClientToken = optional("FACEBOOK_CLIENT_TOKEN"),
+    )
+}
+
+private val envCache = mutableMapOf<String, EnvConfig>()
+
+fun flavorsInCurrentTask(): Set<String>? =
+    gradle.startParameter.taskNames
+        .asSequence()
+        .map { it.substringAfterLast(':').lowercase() }
+        .flatMap { task ->
+            buildList {
+                if ("staging" in task) add("staging")
+                if ("production" in task) add("production")
+            }
+        }
+        .toSet()
+        .takeIf { it.isNotEmpty() }
+
+fun envFor(flavor: String): EnvConfig = envCache.getOrPut(flavor) {
+    val activeFlavors = flavorsInCurrentTask()
+    when {
+        activeFlavors == null -> envConfig(flavor)
+        flavor in activeFlavors -> envConfig(flavor)
+        else -> EnvConfig.placeholder()
+    }
+}
+
+fun com.android.build.api.dsl.ApplicationProductFlavor.applyEnv(
+    environment: String,
+    env: EnvConfig,
+    appName: String,
+    applicationIdSuffix: String? = null,
+    versionNameSuffix: String? = null,
+) {
+    dimension = "environment"
+    applicationIdSuffix?.let { this.applicationIdSuffix = it }
+    versionNameSuffix?.let { this.versionNameSuffix = it }
+    resValue("string", "app_name", appName)
+    buildConfigField("String", "ENVIRONMENT", "\"$environment\"")
+    buildConfigField("String", "API_BASE_URL", env.apiBaseUrl.toBuildConfigString())
+    buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", env.googleWebClientId.toBuildConfigString())
+    buildConfigField("String", "FACEBOOK_APP_ID", env.facebookAppId.toBuildConfigString())
+    buildConfigField("String", "FACEBOOK_CLIENT_TOKEN", env.facebookClientToken.toBuildConfigString())
+    resValue("string", "facebook_app_id", env.facebookAppIdRes)
+    resValue("string", "facebook_client_token", env.facebookClientTokenRes)
+    resValue("string", "fb_login_protocol_scheme", env.fbLoginProtocolScheme)
 }
 
 android {
@@ -113,25 +159,19 @@ android {
     flavorDimensions += "environment"
     productFlavors {
         create("staging") {
-            dimension = "environment"
-            applicationIdSuffix = ".staging"
-            versionNameSuffix = "-staging"
-            resValue("string", "app_name", "Template Staging")
-            buildConfigField("String", "ENVIRONMENT", "\"staging\"")
-            buildConfigField(
-                "String",
-                "API_BASE_URL",
-                envForFlavor("staging").requireEnvProperty("API_BASE_URL", "staging").toBuildConfigString(),
+            applyEnv(
+                environment = "staging",
+                env = envFor("staging"),
+                appName = "Template Staging",
+                applicationIdSuffix = ".staging",
+                versionNameSuffix = "-staging",
             )
         }
         create("production") {
-            dimension = "environment"
-            resValue("string", "app_name", "Template")
-            buildConfigField("String", "ENVIRONMENT", "\"production\"")
-            buildConfigField(
-                "String",
-                "API_BASE_URL",
-                envForFlavor("production").requireEnvProperty("API_BASE_URL", "production").toBuildConfigString(),
+            applyEnv(
+                environment = "production",
+                env = envFor("production"),
+                appName = "Template",
             )
         }
     }
@@ -225,6 +265,12 @@ dependencies {
     implementation(libs.firebase.messaging)
     implementation(libs.firebase.config)
     implementation(libs.firebase.perf)
+
+    // Social auth
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
+    implementation(libs.facebook.login)
 
     // Test
     testImplementation(libs.junit)
