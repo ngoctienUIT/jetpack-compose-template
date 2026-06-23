@@ -5,4 +5,5 @@
     <color name="background">#FFFDFCFF</color>
     <color name="surface">#FFFDFCFF</color>
     <color name="on_surface">#FF1A1C1E</color>
+    <color name="splash_background">#FFFDFCFF</color>
 </resources>

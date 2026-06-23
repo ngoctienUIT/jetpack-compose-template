@@ -25,7 +25,7 @@ class SplashViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            delay(AppConfig.SPLASH_DELAY_MS)
+            delay(AppConfig.splashDelayMs)
             val destination = when (sessionState.first()) {
                 SessionState.Authenticated -> SplashEffect.NavigateToMain
                 SessionState.Loading,

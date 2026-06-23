@@ -7,6 +7,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Language
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,6 +26,13 @@ import com.ngoctientnt.template.feature.theme.ThemeViewModel
 import com.ngoctientnt.template.ui.component.LanguageSelector
 import com.ngoctientnt.template.ui.component.ThemeSelector
 import com.ngoctientnt.template.ui.component.button.AppOutlinedButton
+import com.ngoctientnt.template.ui.component.button.AppTextButton
+import com.ngoctientnt.template.ui.component.toast.LocalAppToastController
+import com.ngoctientnt.template.ui.component.dialog.AppConfirmDialog
+import com.ngoctientnt.template.ui.component.dialog.rememberAppDialogState
+import com.ngoctientnt.template.ui.component.sheet.AppActionBottomSheet
+import com.ngoctientnt.template.ui.component.sheet.AppSheetAction
+import com.ngoctientnt.template.ui.component.sheet.rememberAppBottomSheetState
 
 @Composable
 fun ProfileScreen(
@@ -35,6 +45,44 @@ fun ProfileScreen(
     val canApplyLanguage by localeViewModel.canApplyLanguage.collectAsStateWithLifecycle()
     val pendingThemeMode by themeViewModel.pendingThemeMode.collectAsStateWithLifecycle()
     val canApplyTheme by themeViewModel.canApplyTheme.collectAsStateWithLifecycle()
+
+    val logoutDialogState = rememberAppDialogState()
+    val optionsSheetState = rememberAppBottomSheetState()
+    val toast = LocalAppToastController.current
+    val languageAppliedMessage = stringResource(R.string.toast_language_applied)
+    val themeAppliedMessage = stringResource(R.string.toast_theme_applied)
+
+    AppConfirmDialog(
+        state = logoutDialogState,
+        title = stringResource(R.string.logout_confirm_title),
+        message = stringResource(R.string.logout_confirm_message),
+        confirmText = stringResource(R.string.profile_logout),
+        dismissText = stringResource(R.string.action_cancel),
+        onConfirm = {
+            logoutDialogState.hide()
+            profileViewModel.logout()
+        },
+        destructive = true,
+        loading = isLoggingOut,
+    )
+
+    AppActionBottomSheet(
+        state = optionsSheetState,
+        title = stringResource(R.string.profile_more_options_title),
+        subtitle = stringResource(R.string.profile_more_options_subtitle),
+        actions = listOf(
+            AppSheetAction(
+                label = stringResource(R.string.settings_theme),
+                icon = Icons.Outlined.Settings,
+                onClick = { /* TODO: navigate to theme settings */ },
+            ),
+            AppSheetAction(
+                label = stringResource(R.string.settings_language),
+                icon = Icons.Outlined.Language,
+                onClick = { /* TODO: navigate to language settings */ },
+            ),
+        ),
+    )
 
     Column(
         modifier = Modifier
@@ -52,7 +100,10 @@ fun ProfileScreen(
         LanguageSelector(
             selectedLanguage = pendingLanguage,
             onLanguageSelected = localeViewModel::selectLanguage,
-            onApply = localeViewModel::applyLanguage,
+            onApply = {
+                localeViewModel.applyLanguage()
+                toast.showSuccess(languageAppliedMessage)
+            },
             canApply = canApplyLanguage,
             modifier = Modifier
                 .fillMaxWidth()
@@ -62,8 +113,20 @@ fun ProfileScreen(
         ThemeSelector(
             selectedThemeMode = pendingThemeMode,
             onThemeModeSelected = themeViewModel::selectThemeMode,
-            onApply = themeViewModel::applyThemeMode,
+            onApply = {
+                themeViewModel.applyThemeMode()
+                toast.showSuccess(themeAppliedMessage)
+            },
             canApply = canApplyTheme,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 24.dp),
+        )
+
+        AppTextButton(
+            text = stringResource(R.string.profile_more_options),
+            onClick = optionsSheetState::show,
+            fullWidth = true,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 24.dp),
@@ -71,13 +134,13 @@ fun ProfileScreen(
 
         AppOutlinedButton(
             text = stringResource(R.string.profile_logout),
-            onClick = profileViewModel::logout,
+            onClick = logoutDialogState::show,
             enabled = !isLoggingOut,
             loading = isLoggingOut,
             fullWidth = true,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 32.dp),
+                .padding(top = 16.dp),
         )
     }
 }

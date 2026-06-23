@@ -4,6 +4,7 @@ agp = "9.2.1"
 coilComposeBase = "2.7.0"
 converterKotlinxSerialization = "3.0.0"
 coreKtx = "1.19.0"
+coreSplashscreen = "1.2.0"
 datastorePreferences = "1.2.1"
 daggerHilt = "2.59.2"
 firebaseBom = "34.14.1"
@@ -35,6 +36,7 @@ facebookLogin = "18.0.3"
 [libraries]
 androidx-compose-adaptive-navigation = { module = "androidx.compose.material3.adaptive:adaptive-navigation", version.ref = "adaptiveNavigation" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycleRuntimeCompose" }

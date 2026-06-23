@@ -52,6 +52,18 @@
     <string name="home_open_profile">Mở hồ sơ</string>
     <string name="profile_title">Hồ sơ</string>
     <string name="profile_logout">Đăng xuất</string>
+    <string name="profile_more_options">Tùy chọn khác</string>
+    <string name="profile_more_options_title">Tùy chọn khác</string>
+    <string name="profile_more_options_subtitle">Thao tác nhanh cho hồ sơ của bạn</string>
+    <string name="action_confirm">Xác nhận</string>
+    <string name="action_cancel">Hủy</string>
+    <string name="action_ok">OK</string>
+    <string name="action_close">Đóng</string>
+    <string name="logout_confirm_title">Đăng xuất?</string>
+    <string name="logout_confirm_message">Bạn sẽ cần đăng nhập lại để truy cập tài khoản.</string>
+    <string name="toast_language_applied">Đã cập nhật ngôn ngữ</string>
+    <string name="toast_theme_applied">Đã cập nhật giao diện</string>
+    <string name="login_error_social_auth_failed">Đăng nhập mạng xã hội đã bị hủy hoặc thất bại.</string>
     <string name="action_back">Quay lại</string>
     <string name="detail_title">Chi tiết #%1$s</string>
 

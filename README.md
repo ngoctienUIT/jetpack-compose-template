@@ -26,6 +26,7 @@ Android application template built with **Kotlin**, **Jetpack Compose**, and **M
 - [Central Configuration](#central-configuration)
 - [Production Setup](#production-setup)
 - [Customization Guide](#customization-guide)
+- [Rebrand from Template](#rebrand-from-template)
 - [Gradle Commands](#gradle-commands)
 - [Roadmap / TODO](#roadmap--todo)
 
@@ -116,7 +117,17 @@ git clone <repository-url>
 cd Template
 ```
 
-### 2. Configure Firebase
+### 2. Initialize brand & secrets
+
+```bash
+make brand-init
+```
+
+This creates `config/brand.properties`, copies `secrets/*.example` files, and scaffolds `brand/assets/`.
+
+Edit `config/brand.properties` for your app identity. API keys and OAuth IDs stay in `secrets/env.*.properties` (not committed).
+
+### 3. Configure Firebase
 
 Place your Firebase config files:
 
@@ -126,6 +137,10 @@ app/src/production/google-services.json   # com.ngoctientnt.template
 ```
 
 Each flavor uses a different `applicationId`. Register both package names in the Firebase console.
+
+Alternatively, place configs under `brand/assets/firebase/{staging,production}/` and run `make brand-apply`.
+
+Placeholder structure: `app/src/*/google-services.json.example`
 
 > **Important:** Replace the bundled `google-services.json` files with configs from **your own** Firebase project before shipping. Do not use template Firebase projects in production.
 
@@ -644,9 +659,10 @@ When cloning this template, customize behavior in these files (in order of prior
 
 | File | Purpose |
 |------|---------|
+| **`config/brand.properties`** | App id, display names, brand colors, splash delay, cache dir |
 | **`di/ConfigModule.kt`** | Network timeouts, HTTP logging, app-info header policy, Coil cache |
-| **`app/build.gradle.kts`** | `applicationId`, flavors, `API_BASE_URL`, signing |
-| **`core/config/AppConfig.kt`** | Splash delay, cache dir names, BuildConfig accessors |
+| **`app/build.gradle.kts`** | Reads brand config + env secrets for flavors |
+| **`core/config/AppConfig.kt`** | BuildConfig accessors (splash delay, cache dir, API URL) |
 | **`core/config/NotificationRoutes.kt`** | FCM deep-link route constants |
 | **`core/config/DataStoreNames.kt`** | DataStore file names (sync with backup exclusions) |
 | **`ui/theme/Color.kt`** | Brand color palette |
@@ -685,26 +701,52 @@ See **[TEMPLATE.md](TEMPLATE.md)** for the full step-by-step clone checklist.
 
 ---
 
+## Rebrand from Template
+
+Turn this template into a new app with config + commands:
+
+```bash
+make brand-init                 # scaffold config/brand.properties + secrets + brand/assets/
+# Edit config/brand.properties and add assets (see brand/assets/README.md)
+make brand-dry-run              # preview all changes
+make brand-apply                # identity + colors + icons + splash + firebase
+./gradlew :app:assembleStagingDebug
+```
+
+| Command | Description |
+|---------|-------------|
+| `make brand-init` | Copy config/secrets examples and create asset folders |
+| `make brand-validate` | Check Firebase `package_name`, env files, assets |
+| `make brand-dry-run` | Preview apply steps without writing files |
+| `make brand-apply` | Run full rebrand pipeline |
+| `make brand-icons` | Apply launcher icons only |
+| `make brand-splash` | Apply splash logo only |
+| `./gradlew :app:brandValidate` | Gradle wrapper for validate |
+| `./gradlew :app:brandApplyIdentity -PbrandDryRun=true` | Preview package rename |
+
+**`config/brand.properties`** drives `applicationId`, namespace, app names, colors, splash delay, and theme class names. **`secrets/env.*.properties`** stays separate for API URLs and OAuth credentials.
+
+---
+
 ## Customization Guide
 
 See **[TEMPLATE.md](TEMPLATE.md)** for the complete ordered checklist. Quick summary:
 
 ### 1. Identity
 
-- [ ] Change `applicationId` and `namespace` in `app/build.gradle.kts`
-- [ ] Refactor package `com.ngoctientnt.template`
-- [ ] Replace `google-services.json` per flavor with your Firebase project
-- [ ] Replace launcher icons in `res/mipmap-*`
+- [ ] Run `make brand-init` and edit `config/brand.properties`
+- [ ] Add icons/splash/Firebase under `brand/assets/`
+- [ ] Run `make brand-dry-run` then `make brand-apply`
 
 ### 2. Configuration (single entry point)
 
+- [ ] Edit `config/brand.properties` for app identity and brand colors
+- [ ] Edit `secrets/env.*.properties` for API URLs and OAuth IDs
 - [ ] Edit `di/ConfigModule.kt` for network, app-info, and image settings
-- [ ] Edit `core/config/AppConfig.kt` for app-level constants
-- [ ] Edit `app/build.gradle.kts` flavors for API URLs
 
 ### 3. Branding
 
-- [ ] Edit colors in `ui/theme/Color.kt`
+- [ ] Compose colors in `ui/theme/Color.kt` (XML colors synced via `brand apply colors`)
 - [ ] Adjust `AppComponentDefaults` / `TemplateTheme` presets
 
 ### 4. Release
@@ -741,6 +783,10 @@ See **[TEMPLATE.md](TEMPLATE.md)** for the complete ordered checklist. Quick sum
 
 # Clean
 ./gradlew clean
+
+# Brand / rebrand
+./gradlew :app:brandValidate
+./gradlew :app:brandApplyIdentity -PbrandDryRun=true
 ```
 
 ---

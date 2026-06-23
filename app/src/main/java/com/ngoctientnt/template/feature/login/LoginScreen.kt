@@ -32,11 +32,13 @@ import com.ngoctientnt.template.di.SocialAuthLauncherEntryPoint
 import com.ngoctientnt.template.ui.component.auth.SocialAuthErrorCodes
 import com.ngoctientnt.template.ui.component.auth.SocialAuthLaunchResult
 import com.ngoctientnt.template.ui.component.auth.SocialSignInSection
-import com.ngoctientnt.template.ui.component.auth.resolveSocialAuthErrorMessage
+import com.ngoctientnt.template.core.network.result.ApiUiErrors
 import com.ngoctientnt.template.ui.component.button.AppFilledButton
 import com.ngoctientnt.template.ui.component.button.AppTextButton
 import com.ngoctientnt.template.ui.component.input.AppTextField
-import com.ngoctientnt.template.ui.component.network.resolveApiErrorMessage
+import com.ngoctientnt.template.ui.component.auth.SocialAuthLauncher
+import com.ngoctientnt.template.ui.component.toast.AppToastType
+import com.ngoctientnt.template.ui.component.toast.LocalAppToastController
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.launch
 
@@ -53,33 +55,52 @@ fun LoginScreen(
         context.applicationContext,
         SocialAuthLauncherEntryPoint::class.java,
     ).socialAuthLauncher()
+    val toast = LocalAppToastController.current
+    val resolveLoginError = rememberLoginErrorMessageResolver()
 
     LaunchedEffect(viewModel) {
         viewModel.effect.collect { effect ->
             when (effect) {
                 LoginEffect.NavigateToMain -> navigator.replaceAll(MainRoute())
                 LoginEffect.NavigateToSignUp -> navigator.navigate(SignUpRoute)
+
+                is LoginEffect.ShowToast -> {
+                    val message = resolveLoginError(effect.messageKey)
+                    when (effect.type) {
+                        AppToastType.Success -> toast.showSuccess(message)
+                        AppToastType.Error -> toast.showError(message)
+                        AppToastType.Info -> toast.showInfo(message)
+                        AppToastType.Warning -> toast.showWarning(message)
+                        AppToastType.Default -> toast.show(message)
+                    }
+                }
+
                 LoginEffect.LaunchGoogleSignIn -> {
-                    if (activity == null) return@collect
+                    if (activity == null) {
+                        toast.showError(resolveLoginError(LoginErrors.SOCIAL_AUTH_FAILED))
+                        return@collect
+                    }
                     coroutineScope.launch {
-                        handleSocialAuthResult(
-                            result = socialAuthLauncher.authenticate(
-                                provider = SocialProvider.GOOGLE,
-                                activity = activity,
-                            ),
+                        launchSocialSignIn(
+                            provider = SocialProvider.GOOGLE,
+                            activity = activity,
+                            launcher = socialAuthLauncher,
                             onCompleted = { viewModel.onIntent(LoginIntent.SocialAuthCompleted(it)) },
                             onFailed = { viewModel.onIntent(LoginIntent.SocialAuthFailed(it)) },
                         )
                     }
                 }
+
                 LoginEffect.LaunchFacebookSignIn -> {
-                    if (activity == null) return@collect
+                    if (activity == null) {
+                        toast.showError(resolveLoginError(LoginErrors.SOCIAL_AUTH_FAILED))
+                        return@collect
+                    }
                     coroutineScope.launch {
-                        handleSocialAuthResult(
-                            result = socialAuthLauncher.authenticate(
-                                provider = SocialProvider.FACEBOOK,
-                                activity = activity,
-                            ),
+                        launchSocialSignIn(
+                            provider = SocialProvider.FACEBOOK,
+                            activity = activity,
+                            launcher = socialAuthLauncher,
                             onCompleted = { viewModel.onIntent(LoginIntent.SocialAuthCompleted(it)) },
                             onFailed = { viewModel.onIntent(LoginIntent.SocialAuthFailed(it)) },
                         )
@@ -121,15 +142,6 @@ fun LoginScreen(
                 .padding(top = 16.dp),
         )
 
-        uiState.errorMessage?.let { errorMessage ->
-            Text(
-                text = resolveLoginErrorMessage(errorMessage),
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(top = 8.dp),
-            )
-        }
-
         AppFilledButton(
             text = stringResource(R.string.login_sign_in),
             onClick = { viewModel.onIntent(LoginIntent.SignInClicked) },
@@ -141,7 +153,7 @@ fun LoginScreen(
 
         AppTextButton(
             text = stringResource(R.string.login_forgot_password),
-            onClick = { },
+            onClick = { /* TODO: navigate to forgot-password */ },
             modifier = Modifier.padding(top = 8.dp),
         )
 
@@ -162,12 +174,16 @@ fun LoginScreen(
     }
 }
 
-private fun handleSocialAuthResult(
-    result: SocialAuthLaunchResult,
+// region — helpers
+
+private suspend fun launchSocialSignIn(
+    provider: SocialProvider,
+    activity: ComponentActivity,
+    launcher: SocialAuthLauncher,
     onCompleted: (SocialIdentity) -> Unit,
     onFailed: (String?) -> Unit,
 ) {
-    when (result) {
+    when (val result = launcher.authenticate(provider = provider, activity = activity)) {
         is SocialAuthLaunchResult.Success -> onCompleted(result.identity)
         is SocialAuthLaunchResult.Cancelled -> onFailed(null)
         is SocialAuthLaunchResult.Error -> onFailed(result.errorCode)
@@ -175,12 +191,25 @@ private fun handleSocialAuthResult(
 }
 
 @Composable
-private fun resolveLoginErrorMessage(errorMessage: String): String {
-    return when (errorMessage) {
-        LoginErrors.EMPTY_FIELDS -> stringResource(R.string.login_error_empty_fields)
-        SocialAuthErrorCodes.NOT_CONFIGURED,
-        SocialAuthErrorCodes.FAILED,
-        -> resolveSocialAuthErrorMessage(errorMessage)
-        else -> resolveApiErrorMessage(errorMessage)
+private fun rememberLoginErrorMessageResolver(): (String) -> String {
+    val emptyFieldsMessage = stringResource(R.string.login_error_empty_fields)
+    val socialAuthFailedMessage = stringResource(R.string.login_error_social_auth_failed)
+    val networkErrorMessage = stringResource(R.string.login_error_network)
+    val unknownErrorMessage = stringResource(R.string.login_error_unknown)
+    val socialNotConfiguredMessage = stringResource(R.string.auth_error_social_not_configured)
+    val socialFailedMessage = stringResource(R.string.auth_error_social_failed)
+
+    return { key ->
+        when (key) {
+            LoginErrors.EMPTY_FIELDS -> emptyFieldsMessage
+            LoginErrors.SOCIAL_AUTH_FAILED -> socialAuthFailedMessage
+            SocialAuthErrorCodes.NOT_CONFIGURED -> socialNotConfiguredMessage
+            SocialAuthErrorCodes.FAILED -> socialFailedMessage
+            ApiUiErrors.NETWORK -> networkErrorMessage
+            ApiUiErrors.UNKNOWN -> unknownErrorMessage
+            else -> key
+        }
     }
 }
+
+// endregion

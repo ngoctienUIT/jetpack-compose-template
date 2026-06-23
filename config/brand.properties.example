@@ -1,0 +1,29 @@
+# Brand configuration — copy to config/brand.properties via: ./scripts/brand init
+# Edit application_id and related fields, then: make brand-dry-run && make brand-apply
+
+# Identity
+legacy.application_id=com.ngoctientnt.template
+application_id=com.ngoctientnt.template
+legacy.application_class=TemplateApplication
+application_class=TemplateApplication
+gradle_project_name=Template
+
+# Flavors
+app_name_production=Template
+app_name_staging=Template Staging
+staging_application_id_suffix=.staging
+staging_version_name_suffix=-staging
+
+# Branding colors (synced to res/values/colors.xml)
+primary_color=#0061A4
+primary_dark_color=#00497D
+background_color_light=#FDFCFF
+splash_background_color=#FDFCFF
+
+# Runtime constants (injected via BuildConfig)
+splash_delay_ms=1500
+image_disk_cache_dir=image_cache
+
+# Theme / legacy rename targets
+legacy.theme_name=Theme.Template
+theme_name=Theme.Template

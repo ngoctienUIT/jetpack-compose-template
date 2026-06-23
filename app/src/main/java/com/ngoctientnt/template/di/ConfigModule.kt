@@ -40,7 +40,7 @@ object ConfigModule {
         respectCacheHeaders = true,
         memoryCacheMaxSizePercent = 0.25,
         diskCacheMaxSizePercent = 0.02,
-        diskCacheDirectoryName = com.ngoctientnt.template.core.config.AppConfig.IMAGE_DISK_CACHE_DIR,
+        diskCacheDirectoryName = com.ngoctientnt.template.core.config.AppConfig.imageDiskCacheDir,
     )
 
     @Provides

@@ -17,6 +17,62 @@ val signingProperties = Properties().apply {
     }
 }
 
+fun loadBrandProperties(): Properties {
+    val brandFile = rootProject.file("config/brand.properties")
+    val exampleFile = rootProject.file("config/brand.properties.example")
+    val fileToLoad = brandFile.takeIf { it.exists() }
+        ?: exampleFile.takeIf { it.exists() }
+        ?: error(
+            "Missing config/brand.properties. " +
+                "Run ./scripts/brand init and edit config/brand.properties.",
+        )
+
+    if (!brandFile.exists()) {
+        logger.warn(
+            "config/brand.properties not found — using config/brand.properties.example defaults",
+        )
+    }
+
+    return Properties().apply {
+        fileToLoad.inputStream().use { load(it) }
+    }
+}
+
+data class BrandConfig(
+    val applicationId: String,
+    val appNameProduction: String,
+    val appNameStaging: String,
+    val stagingApplicationIdSuffix: String,
+    val stagingVersionNameSuffix: String,
+    val splashDelayMs: Long,
+    val imageDiskCacheDir: String,
+) {
+    val stagingApplicationId: String
+        get() = applicationId + stagingApplicationIdSuffix
+}
+
+fun brandConfig(): BrandConfig {
+    val props = loadBrandProperties()
+    fun required(key: String): String =
+        props.getProperty(key)?.trim()?.takeIf { it.isNotEmpty() }
+            ?: error("Missing '$key' in brand config")
+
+    fun optional(key: String, default: String): String =
+        props.getProperty(key)?.trim()?.takeIf { it.isNotEmpty() } ?: default
+
+    return BrandConfig(
+        applicationId = required("application_id"),
+        appNameProduction = required("app_name_production"),
+        appNameStaging = required("app_name_staging"),
+        stagingApplicationIdSuffix = optional("staging_application_id_suffix", ".staging"),
+        stagingVersionNameSuffix = optional("staging_version_name_suffix", "-staging"),
+        splashDelayMs = optional("splash_delay_ms", "1500").toLong(),
+        imageDiskCacheDir = optional("image_disk_cache_dir", "image_cache"),
+    )
+}
+
+val brand = brandConfig()
+
 fun loadEnvProperties(flavorName: String): Properties {
     val envFile = rootProject.file("secrets/env.$flavorName.properties")
     val exampleFile = rootProject.file("secrets/env.$flavorName.properties.example")
@@ -126,19 +182,22 @@ fun com.android.build.api.dsl.ApplicationProductFlavor.applyEnv(
 }
 
 android {
-    namespace = "com.ngoctientnt.template"
+    namespace = brand.applicationId
     compileSdk {
         version = release(37)
     }
 
     defaultConfig {
-        applicationId = "com.ngoctientnt.template"
+        applicationId = brand.applicationId
         minSdk = 24
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("long", "SPLASH_DELAY_MS", "${brand.splashDelayMs}L")
+        buildConfigField("String", "IMAGE_DISK_CACHE_DIR", brand.imageDiskCacheDir.toBuildConfigString())
 
         vectorDrawables {
             useSupportLibrary = true
@@ -162,16 +221,16 @@ android {
             applyEnv(
                 environment = "staging",
                 env = envFor("staging"),
-                appName = "Template Staging",
-                applicationIdSuffix = ".staging",
-                versionNameSuffix = "-staging",
+                appName = brand.appNameStaging,
+                applicationIdSuffix = brand.stagingApplicationIdSuffix,
+                versionNameSuffix = brand.stagingVersionNameSuffix,
             )
         }
         create("production") {
             applyEnv(
                 environment = "production",
                 env = envFor("production"),
-                appName = "Template",
+                appName = brand.appNameProduction,
             )
         }
     }
@@ -230,6 +289,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
@@ -280,4 +340,25 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
+}
+
+tasks.register<Exec>("brandValidate") {
+    group = "brand"
+    description = "Validate brand config, Firebase package names, and assets."
+    workingDir = rootProject.projectDir
+    commandLine("python3", "scripts/brand_lib/cli.py", "validate")
+}
+
+tasks.register<Exec>("brandApplyIdentity") {
+    group = "brand"
+    description = "Apply brand identity (package rename, theme, settings)."
+    workingDir = rootProject.projectDir
+    val dryRun = project.findProperty("brandDryRun")?.toString() == "true"
+    commandLine(
+        "python3",
+        "scripts/brand_lib/cli.py",
+        "apply",
+        "identity",
+        *(if (dryRun) arrayOf("--dry-run") else emptyArray()),
+    )
 }

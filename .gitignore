@@ -15,6 +15,9 @@
 local.properties
 
 # Signing — copy from secrets/signing.properties.example
+# Brand — copy from config/brand.properties.example via ./scripts/brand init
+config/brand.properties
+
 secrets/signing.properties
 secrets/env.staging.properties
 secrets/env.production.properties

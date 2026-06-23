@@ -17,8 +17,8 @@ object AppConfig {
     val facebookAppId: String get() = BuildConfig.FACEBOOK_APP_ID
     val facebookClientToken: String get() = BuildConfig.FACEBOOK_CLIENT_TOKEN
 
-    const val SPLASH_DELAY_MS = 1_500L
+    val splashDelayMs: Long get() = BuildConfig.SPLASH_DELAY_MS
+    val imageDiskCacheDir: String get() = BuildConfig.IMAGE_DISK_CACHE_DIR
 
-    const val IMAGE_DISK_CACHE_DIR = "image_cache"
     const val MIN_PASSWORD_LENGTH = 8
 }

@@ -9,6 +9,7 @@ import com.ngoctientnt.template.core.auth.domain.usecase.LoginUseCase
 import com.ngoctientnt.template.core.auth.domain.usecase.SocialAuthUseCase
 import com.ngoctientnt.template.core.auth.social.SocialAuthGateway
 import com.ngoctientnt.template.core.network.result.handleResult
+import com.ngoctientnt.template.ui.component.toast.AppToastType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
@@ -39,8 +40,8 @@ class LoginViewModel @Inject constructor(
 
     fun onIntent(intent: LoginIntent) {
         when (intent) {
-            is LoginIntent.EmailChanged -> reduce { copy(email = intent.value, errorMessage = null) }
-            is LoginIntent.PasswordChanged -> reduce { copy(password = intent.value, errorMessage = null) }
+            is LoginIntent.EmailChanged -> reduce { copy(email = intent.value) }
+            is LoginIntent.PasswordChanged -> reduce { copy(password = intent.value) }
             LoginIntent.SignInClicked -> signIn()
             LoginIntent.GoogleSignInClicked -> launchSocialAuth(SocialProvider.GOOGLE)
             LoginIntent.FacebookSignInClicked -> launchSocialAuth(SocialProvider.FACEBOOK)
@@ -58,19 +59,20 @@ class LoginViewModel @Inject constructor(
         val password = currentState.password
 
         if (email.isBlank() || password.isBlank()) {
-            reduce { copy(errorMessage = LoginErrors.EMPTY_FIELDS) }
+            sendToast(LoginErrors.EMPTY_FIELDS)
             return
         }
 
         viewModelScope.launch {
-            reduce { copy(isLoading = true, errorMessage = null) }
+            reduce { copy(isLoading = true) }
             loginUseCase(email, password).handleResult(
                 onSuccess = {
                     reduce { copy(isLoading = false) }
                     _effect.send(LoginEffect.NavigateToMain)
                 },
-                onError = { errorMessage ->
-                    reduce { copy(isLoading = false, errorMessage = errorMessage) }
+                onError = { errorKey ->
+                    reduce { copy(isLoading = false) }
+                    sendToast(errorKey)
                 },
             )
         }
@@ -86,13 +88,13 @@ class LoginViewModel @Inject constructor(
         }
         if (!isEnabled) return
 
-        reduce { copy(socialLoadingProvider = provider, errorMessage = null) }
+        reduce { copy(socialLoadingProvider = provider) }
         viewModelScope.launch {
-            val effect = when (provider) {
+            val launchEffect = when (provider) {
                 SocialProvider.GOOGLE -> LoginEffect.LaunchGoogleSignIn
                 SocialProvider.FACEBOOK -> LoginEffect.LaunchFacebookSignIn
             }
-            _effect.send(effect)
+            _effect.send(launchEffect)
         }
     }
 
@@ -106,30 +108,28 @@ class LoginViewModel @Inject constructor(
                     reduce { copy(socialLoadingProvider = null) }
                     _effect.send(LoginEffect.NavigateToMain)
                 },
-                onError = { errorMessage ->
-                    reduce {
-                        copy(
-                            socialLoadingProvider = null,
-                            errorMessage = errorMessage,
-                        )
-                    }
+                onError = { errorKey ->
+                    reduce { copy(socialLoadingProvider = null) }
+                    sendToast(errorKey)
                 },
             )
         }
     }
 
     private fun handleSocialAuthFailed(errorCode: String?) {
-        reduce {
-            copy(
-                socialLoadingProvider = null,
-                errorMessage = errorCode,
-            )
-        }
+        reduce { copy(socialLoadingProvider = null) }
+        sendToast(errorCode ?: LoginErrors.SOCIAL_AUTH_FAILED)
     }
 
     private fun navigateToSignUp() {
         viewModelScope.launch {
             _effect.send(LoginEffect.NavigateToSignUp)
+        }
+    }
+
+    private fun sendToast(messageKey: String, type: AppToastType = AppToastType.Error) {
+        viewModelScope.launch {
+            _effect.send(LoginEffect.ShowToast(messageKey = messageKey, type = type))
         }
     }
 

@@ -57,6 +57,18 @@
     <string name="home_open_profile">Open Profile</string>
     <string name="profile_title">Profile</string>
     <string name="profile_logout">Sign out</string>
+    <string name="profile_more_options">More options</string>
+    <string name="profile_more_options_title">More options</string>
+    <string name="profile_more_options_subtitle">Quick actions for your profile</string>
+    <string name="action_confirm">Confirm</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_ok">OK</string>
+    <string name="action_close">Close</string>
+    <string name="logout_confirm_title">Sign out?</string>
+    <string name="logout_confirm_message">You will need to sign in again to access your account.</string>
+    <string name="toast_language_applied">Language updated</string>
+    <string name="toast_theme_applied">Theme updated</string>
+    <string name="login_error_social_auth_failed">Social sign-in was cancelled or failed.</string>
     <string name="action_back">Back</string>
     <string name="detail_title">Detail #%1$s</string>
 

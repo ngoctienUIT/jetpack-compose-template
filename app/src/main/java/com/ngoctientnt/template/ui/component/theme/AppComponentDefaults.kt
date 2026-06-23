@@ -41,6 +41,37 @@ object AppComponentDefaults {
         imageErrorColor: Color = MaterialTheme.colorScheme.errorContainer,
         imagePlaceholderIconSize: Dp = 24.dp,
         avatarSize: Dp = 48.dp,
+        dialogShape: Shape = MaterialTheme.shapes.extraLarge,
+        sheetShape: Shape = RoundedCornerShape(
+            topStart = 28.dp,
+            topEnd = 28.dp,
+            bottomStart = 0.dp,
+            bottomEnd = 0.dp,
+        ),
+        overlayContentPadding: Dp = 24.dp,
+        sheetDragHandleWidth: Dp = 32.dp,
+        sheetDragHandleHeight: Dp = 4.dp,
+        sheetDragHandleColor: Color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+        dialogTitleStyle: TextStyle = MaterialTheme.typography.titleLarge,
+        dialogMessageStyle: TextStyle = MaterialTheme.typography.bodyMedium,
+        sheetTitleStyle: TextStyle = MaterialTheme.typography.titleLarge,
+        toastShape: Shape = MaterialTheme.shapes.medium,
+        toastContentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 14.dp),
+        toastIconSpacing: Dp = 12.dp,
+        toastTextStyle: TextStyle = MaterialTheme.typography.bodyMedium,
+        toastIconSize: Dp = 24.dp,
+        toastElevation: Dp = 6.dp,
+        toastHostPadding: Dp = 24.dp,
+        toastSuccessContainerColor: Color = MaterialTheme.colorScheme.primaryContainer,
+        toastSuccessContentColor: Color = MaterialTheme.colorScheme.onPrimaryContainer,
+        toastErrorContainerColor: Color = MaterialTheme.colorScheme.errorContainer,
+        toastErrorContentColor: Color = MaterialTheme.colorScheme.onErrorContainer,
+        toastInfoContainerColor: Color = MaterialTheme.colorScheme.secondaryContainer,
+        toastInfoContentColor: Color = MaterialTheme.colorScheme.onSecondaryContainer,
+        toastWarningContainerColor: Color = MaterialTheme.colorScheme.tertiaryContainer,
+        toastWarningContentColor: Color = MaterialTheme.colorScheme.onTertiaryContainer,
+        toastDefaultContainerColor: Color = MaterialTheme.colorScheme.inverseSurface,
+        toastDefaultContentColor: Color = MaterialTheme.colorScheme.inverseOnSurface,
     ): AppComponentTheme = AppComponentTheme(
         buttonShape = buttonShape,
         buttonMinHeight = buttonMinHeight,
@@ -63,15 +94,49 @@ object AppComponentDefaults {
         imageErrorColor = imageErrorColor,
         imagePlaceholderIconSize = imagePlaceholderIconSize,
         avatarSize = avatarSize,
+        dialogShape = dialogShape,
+        sheetShape = sheetShape,
+        overlayContentPadding = overlayContentPadding,
+        sheetDragHandleWidth = sheetDragHandleWidth,
+        sheetDragHandleHeight = sheetDragHandleHeight,
+        sheetDragHandleColor = sheetDragHandleColor,
+        dialogTitleStyle = dialogTitleStyle,
+        dialogMessageStyle = dialogMessageStyle,
+        sheetTitleStyle = sheetTitleStyle,
+        toastShape = toastShape,
+        toastContentPadding = toastContentPadding,
+        toastIconSpacing = toastIconSpacing,
+        toastTextStyle = toastTextStyle,
+        toastIconSize = toastIconSize,
+        toastElevation = toastElevation,
+        toastHostPadding = toastHostPadding,
+        toastSuccessContainerColor = toastSuccessContainerColor,
+        toastSuccessContentColor = toastSuccessContentColor,
+        toastErrorContainerColor = toastErrorContainerColor,
+        toastErrorContentColor = toastErrorContentColor,
+        toastInfoContainerColor = toastInfoContainerColor,
+        toastInfoContentColor = toastInfoContentColor,
+        toastWarningContainerColor = toastWarningContainerColor,
+        toastWarningContentColor = toastWarningContentColor,
+        toastDefaultContainerColor = toastDefaultContainerColor,
+        toastDefaultContentColor = toastDefaultContentColor,
     )
 
     @Composable
     fun roundedTheme(cornerRadius: Dp = 16.dp): AppComponentTheme {
         val shape = RoundedCornerShape(cornerRadius)
+        val sheetShape = RoundedCornerShape(
+            topStart = cornerRadius,
+            topEnd = cornerRadius,
+            bottomStart = 0.dp,
+            bottomEnd = 0.dp,
+        )
         return theme(
             buttonShape = shape,
             textFieldShape = shape,
             imageShape = shape,
+            dialogShape = shape,
+            sheetShape = sheetShape,
         )
     }
 
@@ -86,10 +151,18 @@ object AppComponentDefaults {
         outlinedBorderWidth: Dp = 1.dp,
     ): AppComponentTheme {
         val shape = RoundedCornerShape(cornerRadius)
+        val sheetShape = RoundedCornerShape(
+            topStart = cornerRadius,
+            topEnd = cornerRadius,
+            bottomStart = 0.dp,
+            bottomEnd = 0.dp,
+        )
         return theme(
             buttonShape = shape,
             textFieldShape = shape,
             imageShape = shape,
+            dialogShape = shape,
+            sheetShape = sheetShape,
             outlinedButtonBorderWidth = outlinedBorderWidth,
             filledButtonColors = ButtonDefaults.buttonColors(
                 containerColor = primaryButtonColor,
@@ -120,3 +193,9 @@ fun AppComponentTheme.withTextFieldColors(colors: TextFieldColors): AppComponent
     copy(textFieldColors = colors)
 
 fun AppComponentTheme.withImageShape(shape: Shape): AppComponentTheme = copy(imageShape = shape)
+
+fun AppComponentTheme.withDialogShape(shape: Shape): AppComponentTheme = copy(dialogShape = shape)
+
+fun AppComponentTheme.withSheetShape(shape: Shape): AppComponentTheme = copy(sheetShape = shape)
+
+fun AppComponentTheme.withToastShape(shape: Shape): AppComponentTheme = copy(toastShape = shape)
