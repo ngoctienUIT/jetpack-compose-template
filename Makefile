@@ -1,4 +1,4 @@
-.PHONY: brand-init brand-validate brand-apply brand-icons brand-splash brand-dry-run
+.PHONY: brand-init brand-validate brand-apply brand-icons brand-splash brand-dry-run gen-feature
 
 brand-init:
 	./scripts/brand init
@@ -17,3 +17,7 @@ brand-splash:
 
 brand-dry-run:
 	./scripts/brand apply all --dry-run
+
+gen-feature:
+	@read -p "Enter feature name (e.g. Settings): " name; \
+	python3 ./scripts/gen_feature.py $$name

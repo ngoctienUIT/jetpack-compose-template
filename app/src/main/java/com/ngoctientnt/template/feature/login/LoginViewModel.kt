@@ -1,7 +1,7 @@
 package com.ngoctientnt.template.feature.login
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ngoctientnt.template.core.architecture.BaseViewModel
 import com.ngoctientnt.template.core.auth.domain.model.SocialAuthIntent
 import com.ngoctientnt.template.core.auth.domain.model.SocialIdentity
 import com.ngoctientnt.template.core.auth.domain.model.SocialProvider
@@ -25,20 +25,14 @@ class LoginViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
     private val socialAuthUseCase: SocialAuthUseCase,
     socialAuthGateway: SocialAuthGateway,
-) : ViewModel() {
+) : BaseViewModel<LoginUiState, LoginIntent, LoginEffect>(
+    LoginUiState(
+        isGoogleEnabled = socialAuthGateway.isProviderConfigured(SocialProvider.GOOGLE),
+        isFacebookEnabled = socialAuthGateway.isProviderConfigured(SocialProvider.FACEBOOK),
+    ),
+) {
 
-    private val _uiState = MutableStateFlow(
-        LoginUiState(
-            isGoogleEnabled = socialAuthGateway.isProviderConfigured(SocialProvider.GOOGLE),
-            isFacebookEnabled = socialAuthGateway.isProviderConfigured(SocialProvider.FACEBOOK),
-        ),
-    )
-    val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
-
-    private val _effect = Channel<LoginEffect>(Channel.BUFFERED)
-    val effect = _effect.receiveAsFlow()
-
-    fun onIntent(intent: LoginIntent) {
+    override fun onIntent(intent: LoginIntent) {
         when (intent) {
             is LoginIntent.EmailChanged -> reduce { copy(email = intent.value) }
             is LoginIntent.PasswordChanged -> reduce { copy(password = intent.value) }
@@ -52,7 +46,6 @@ class LoginViewModel @Inject constructor(
     }
 
     private fun signIn() {
-        val currentState = _uiState.value
         if (currentState.isLoading || currentState.socialLoadingProvider != null) return
 
         val email = currentState.email.trim()
@@ -68,7 +61,7 @@ class LoginViewModel @Inject constructor(
             loginUseCase(email, password).handleResult(
                 onSuccess = {
                     reduce { copy(isLoading = false) }
-                    _effect.send(LoginEffect.NavigateToMain)
+                    sendEffect(LoginEffect.NavigateToMain)
                 },
                 onError = { errorKey ->
                     reduce { copy(isLoading = false) }
@@ -79,7 +72,6 @@ class LoginViewModel @Inject constructor(
     }
 
     private fun launchSocialAuth(provider: SocialProvider) {
-        val currentState = _uiState.value
         if (currentState.isLoading || currentState.socialLoadingProvider != null) return
 
         val isEnabled = when (provider) {
@@ -89,13 +81,11 @@ class LoginViewModel @Inject constructor(
         if (!isEnabled) return
 
         reduce { copy(socialLoadingProvider = provider) }
-        viewModelScope.launch {
-            val launchEffect = when (provider) {
-                SocialProvider.GOOGLE -> LoginEffect.LaunchGoogleSignIn
-                SocialProvider.FACEBOOK -> LoginEffect.LaunchFacebookSignIn
-            }
-            _effect.send(launchEffect)
+        val launchEffect = when (provider) {
+            SocialProvider.GOOGLE -> LoginEffect.LaunchGoogleSignIn
+            SocialProvider.FACEBOOK -> LoginEffect.LaunchFacebookSignIn
         }
+        sendEffect(launchEffect)
     }
 
     private fun completeSocialAuth(identity: SocialIdentity) {
@@ -106,7 +96,7 @@ class LoginViewModel @Inject constructor(
             ).handleResult(
                 onSuccess = {
                     reduce { copy(socialLoadingProvider = null) }
-                    _effect.send(LoginEffect.NavigateToMain)
+                    sendEffect(LoginEffect.NavigateToMain)
                 },
                 onError = { errorKey ->
                     reduce { copy(socialLoadingProvider = null) }
@@ -122,18 +112,10 @@ class LoginViewModel @Inject constructor(
     }
 
     private fun navigateToSignUp() {
-        viewModelScope.launch {
-            _effect.send(LoginEffect.NavigateToSignUp)
-        }
+        sendEffect(LoginEffect.NavigateToSignUp)
     }
 
     private fun sendToast(messageKey: String, type: AppToastType = AppToastType.Error) {
-        viewModelScope.launch {
-            _effect.send(LoginEffect.ShowToast(messageKey = messageKey, type = type))
-        }
-    }
-
-    private inline fun reduce(block: LoginUiState.() -> LoginUiState) {
-        _uiState.update(block)
+        sendEffect(LoginEffect.ShowToast(messageKey = messageKey, type = type))
     }
 }

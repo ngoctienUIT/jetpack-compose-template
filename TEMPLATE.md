@@ -1,60 +1,80 @@
-# Clone checklist — follow in order when starting a new project from this template.
+# Clone Checklist & Migration Guide
 
-## 1. Brand & identity (automated)
+Follow this guide step-by-step when starting a new project from this template to ensure a seamless setup.
 
-```bash
-make brand-init
-# Edit config/brand.properties (application_id, app names, colors, theme)
-# Add assets under brand/assets/ (icons, splash, firebase) — see brand/assets/README.md
-make brand-dry-run    # preview changes
-make brand-apply      # apply identity, colors, icons, splash, firebase
-make brand-validate   # verify Firebase package names and config
-```
+---
 
-Manual follow-ups after `brand apply`:
-- [ ] Review `config/brand.properties` — set `legacy.*` to template values before first apply
-- [ ] Sync `ui/theme/Color.kt` Compose palette if needed (XML colors applied automatically)
-- [ ] Run `./gradlew :app:assembleStagingDebug` and smoke-test splash + launcher icon
+## Phase 1: Identity & Branding (The "First 5 Minutes")
 
-Gradle also exposes:
-- `./gradlew :app:brandValidate`
-- `./gradlew :app:brandApplyIdentity -PbrandDryRun=true`
+1.  **Initialize**:
+    ```bash
+    make brand-init
+    ```
+2.  **Configure Identity**:
+    - Open `config/brand.properties`.
+    - Set `application_id` (e.g., `com.company.newapp`).
+    - Set `app_name_production` and `app_name_staging`.
+    - Set `theme_name` (this will be the name of your Compose theme class).
+3.  **Visual Assets**:
+    - Replace launcher icons in `brand/assets/icons/`.
+    - Replace splash logo in `brand/assets/splash/logo.png`.
+    - Set `primary_color` in `brand.properties`.
+4.  **Apply Identity**:
+    ```bash
+    make brand-apply
+    ```
+    *Note: This will rename your packages, update AndroidManifest, and generate your Color palette.*
 
-## 2. Environment & API
-- [ ] Copy `secrets/env.staging.properties.example` → `secrets/env.staging.properties` (or use `make brand-init`)
-- [ ] Copy `secrets/env.production.properties.example` → `secrets/env.production.properties`
-- [ ] Set `API_BASE_URL`, OAuth IDs per flavor
-- [ ] Add Retrofit API interfaces + `@Provides` in `di/NetworkModule.kt`
-- [ ] Uncomment HTTP cleartext domains in `res/xml/network_security_config.xml` if needed for local dev
+---
 
-## 3. Firebase
-- [ ] Create Firebase projects for staging and production
-- [ ] Place configs in `brand/assets/firebase/{staging,production}/google-services.json` and run `make brand-apply`
-- [ ] Or copy `app/src/*/google-services.json.example` → `google-services.json` per flavor folder
-- [ ] Restrict API keys in Firebase/Google Cloud console
+## Phase 2: Environment & Infrastructure
 
-## 4. Signing & Release
-- [ ] Copy `secrets/signing.properties.example` → `secrets/signing.properties`
-- [ ] Generate release keystore and update paths/passwords
-- [ ] Verify `./gradlew :app:assembleProductionRelease` succeeds with R8 enabled
+1.  **API Configuration**:
+    - Edit `secrets/env.staging.properties` and `secrets/env.production.properties`.
+    - Update `API_BASE_URL`.
+2.  **Firebase Integration**:
+    - Create projects in Firebase Console for both staging and production.
+    - Download `google-services.json` and place them in `brand/assets/firebase/staging/` and `production/`.
+    - Run `make brand-apply` to copy them to the app module.
+3.  **Release Signing**:
+    - Generate a release keystore.
+    - Copy `secrets/signing.properties.example` to `secrets/signing.properties`.
+    - Update keystore path and passwords (never commit this file).
 
-## 5. Configuration (single place to customize)
-- [ ] `config/brand.properties` — app id, names, colors, splash delay, cache dir name
-- [ ] `di/ConfigModule.kt` — NetworkConfig, AppInfoConfig, AppImageLoaderConfig
-- [ ] `ui/theme/Color.kt` — Compose brand colors
-- [ ] `ui/component/theme/AppComponentDefaults.kt` — shared component styling
+---
 
-## 6. Privacy & Security
-- [ ] Review `AppInfoConfig.includeAndroidId` / `includeUdidInHeaders` in `ConfigModule`
-- [ ] Review `backup_rules.xml` exclusions for sensitive DataStore files
-- [ ] Integrate crash reporting (Firebase Crashlytics / Sentry)
+## Phase 3: Core Logic Customization
 
-## 7. Features
-- [ ] Wire auth in `SplashScreen` (replace hardcoded `MainRoute`)
-- [ ] Send FCM token to backend in `FcmTokenManager.onNewToken`
-- [ ] Add Room `@Database` when offline storage is needed
-- [ ] Add Paging when implementing paginated lists
+1.  **Networking**:
+    - Define your Retrofit interfaces in `core/network/api/`.
+    - Provide them in `di/NetworkModule.kt`.
+2.  **Authentication**:
+    - Open `SplashScreen.kt`.
+    - Replace the hardcoded navigation logic with your Auth check (Token check).
+3.  **Deep Linking**:
+    - Update `core/config/NotificationRoutes.kt` with your app's specific deep link paths.
+4.  **Global UI Defaults**:
+    - Adjust `ui/component/theme/AppComponentDefaults.kt` to match your brand's button shapes, image corners, etc.
 
-## 8. CI (recommended)
-- [ ] Add GitHub Actions: compile, lint, unit tests
-- [ ] Inject `secrets/signing.properties` and `google-services.json` from CI secrets
+---
+
+## Phase 4: Feature Development
+
+1.  **Create your first feature**:
+    ```bash
+    make gen-feature
+    ```
+2.  **Register Route**:
+    - Add the new `@Serializable` route to `app/navigation/Route.kt`.
+3.  **Add to Host**:
+    - Register the screen in `app/navigation/AppNavHost.kt`.
+
+---
+
+## Phase 5: Production Checklist (Before Release)
+
+- [ ] **R8 Verification**: Run `./gradlew :app:assembleProductionRelease` and verify the app opens without crashes.
+- [ ] **Privacy Policy**: Review `AppInfoConfig` in `ConfigModule.kt`. Ensure you only send necessary device headers.
+- [ ] **Security**: Ensure `base-config cleartextTrafficPermitted="false"` is set in `network_security_config.xml`.
+- [ ] **Localization**: Verify all hardcoded strings are moved to `strings.xml` (En/Vi).
+- [ ] **CI**: Push to GitHub/GitLab and ensure the CI pipeline passes.

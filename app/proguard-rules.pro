@@ -1,9 +1,14 @@
-# Add project specific ProGuard rules here.
+# Project-specific ProGuard rules
 # https://developer.android.com/studio/build/shrink-code
 
 # Keep line numbers for readable crash reports in Play Console
 -keepattributes SourceFile,LineNumberTable
 -renamesourcefileattribute SourceFile
+
+# --- Optimization Flags ---
+-optimizationpasses 5
+-allowaccessmodification
+-mergeinterfacesaggressively
 
 # --- Kotlin ---
 -keep class kotlin.Metadata { *; }
@@ -12,8 +17,15 @@
     <fields>;
 }
 
+# --- Coroutines ---
+-keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
+-keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
+-keepnames class kotlinx.coroutines.android.AndroidExceptionPreHandler {}
+-keepnames class kotlinx.coroutines.android.AndroidDispatcherFactory {}
+-dontwarn kotlinx.coroutines.**
+
 # --- Kotlinx Serialization ---
--keepattributes *Annotation*, InnerClasses
+-keepattributes *Annotation*, InnerClasses, RuntimeVisibleAnnotations, AnnotationDefault
 -dontnote kotlinx.serialization.**
 -keepclassmembers class kotlinx.serialization.json.** {
     *** Companion;
@@ -26,7 +38,7 @@
     <init>(...);
 }
 
-# --- Retrofit ---
+# --- Retrofit & OkHttp ---
 -dontwarn okhttp3.**
 -dontwarn okio.**
 -dontwarn javax.annotation.**
