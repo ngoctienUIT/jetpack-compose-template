@@ -7,7 +7,7 @@ import com.ngoctientnt.template.R
 
 enum class AppLanguage(
     val languageTag: String?,
-    @StringRes val displayNameRes: Int,
+    @get:StringRes val displayNameRes: Int,
 ) {
     SYSTEM(null, R.string.language_system),
     ENGLISH("en", R.string.language_english),

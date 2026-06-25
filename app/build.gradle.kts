@@ -10,6 +10,12 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+    arg("room.incremental", "true")
+    arg("room.expandProjection", "true")
+}
+
 val signingPropertiesFile = rootProject.file("secrets/signing.properties")
 val signingProperties = Properties().apply {
     if (signingPropertiesFile.exists()) {
@@ -306,12 +312,16 @@ dependencies {
     implementation(libs.logging.interceptor)
     implementation(libs.kotlinx.serialization.json)
 
-    // Room — dependency ready; add @Database when implementing local cache
+    // Room — see README_ROOM.md for extending entities, DAOs, and migrations
     ksp(libs.hilt.compiler)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.paging)
+    implementation(libs.sqlcipher.android)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.datastore.tink)
+    // Legacy EncryptedSharedPreferences migration only — see LegacyEncryptedSharedPreferencesMigration.kt
     implementation(libs.androidx.security.crypto)
 
     implementation(libs.coil.compose)
@@ -334,10 +344,14 @@ dependencies {
 
     // Test
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.room.testing)
+    androidTestImplementation(libs.androidx.arch.core.testing)
+    androidTestImplementation(libs.kotlinx.coroutines.test)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
 }

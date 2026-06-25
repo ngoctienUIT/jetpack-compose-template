@@ -4,6 +4,7 @@ import android.app.Application
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import com.ngoctientnt.template.core.startup.ApplicationBootstrap
+import com.ngoctientnt.template.core.startup.SqlCipherInitializer
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
@@ -19,6 +20,7 @@ class TemplateApplication : Application(), ImageLoaderFactory {
     override fun newImageLoader(): ImageLoader = imageLoader
 
     override fun onCreate() {
+        SqlCipherInitializer.loadIfNeeded(!BuildConfig.DEBUG)
         super.onCreate()
         applicationBootstrap.start()
     }

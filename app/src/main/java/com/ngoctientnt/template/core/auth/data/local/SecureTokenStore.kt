@@ -1,11 +1,10 @@
 package com.ngoctientnt.template.core.auth.data.local
 
-import android.content.Context
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import com.ngoctientnt.template.core.auth.domain.model.AuthTokens
+import com.ngoctientnt.template.core.config.DataStoreNames
 import com.ngoctientnt.template.core.config.SecureStorageNames
-import dagger.hilt.android.qualifiers.ApplicationContext
+import com.ngoctientnt.template.core.security.EncryptedPreferencesStoreFactory
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
@@ -15,18 +14,13 @@ import kotlinx.coroutines.flow.update
 
 @Singleton
 class SecureTokenStore @Inject constructor(
-    @ApplicationContext context: Context,
+    encryptedPreferencesStoreFactory: EncryptedPreferencesStoreFactory,
 ) {
-    private val masterKey = MasterKey.Builder(context)
-        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-        .build()
-
-    private val sharedPreferences = EncryptedSharedPreferences.create(
-        context,
-        SecureStorageNames.AUTH_PREFS,
-        masterKey,
-        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
+    private val store = encryptedPreferencesStoreFactory.create(
+        dataStoreFileName = DataStoreNames.AUTH_ENCRYPTED,
+        keysetSharedPrefsName = SecureStorageNames.AUTH_KEYSET,
+        masterKeyUri = MASTER_KEY_URI,
+        legacySharedPrefsName = SecureStorageNames.AUTH_PREFS,
     )
 
     private val tokensState = MutableStateFlow(readTokensSync())
@@ -34,8 +28,8 @@ class SecureTokenStore @Inject constructor(
     val tokens: Flow<AuthTokens?> = tokensState.asStateFlow()
 
     fun readTokensSync(): AuthTokens? {
-        val accessToken = sharedPreferences.getString(KEY_ACCESS_TOKEN, null)
-        val refreshToken = sharedPreferences.getString(KEY_REFRESH_TOKEN, null)
+        val accessToken = store.getStringBlocking(ACCESS_TOKEN_KEY)
+        val refreshToken = store.getStringBlocking(REFRESH_TOKEN_KEY)
         if (accessToken.isNullOrBlank() || refreshToken.isNullOrBlank()) {
             return null
         }
@@ -46,23 +40,24 @@ class SecureTokenStore @Inject constructor(
     }
 
     suspend fun saveTokens(tokens: AuthTokens) {
-        sharedPreferences.edit()
-            .putString(KEY_ACCESS_TOKEN, tokens.accessToken)
-            .putString(KEY_REFRESH_TOKEN, tokens.refreshToken)
-            .apply()
+        store.edit { preferences ->
+            preferences[ACCESS_TOKEN_KEY] = tokens.accessToken
+            preferences[REFRESH_TOKEN_KEY] = tokens.refreshToken
+        }
         tokensState.update { tokens }
     }
 
     suspend fun clearTokens() {
-        sharedPreferences.edit()
-            .remove(KEY_ACCESS_TOKEN)
-            .remove(KEY_REFRESH_TOKEN)
-            .apply()
+        store.edit { preferences ->
+            preferences.remove(ACCESS_TOKEN_KEY)
+            preferences.remove(REFRESH_TOKEN_KEY)
+        }
         tokensState.update { null }
     }
 
     companion object {
-        private const val KEY_ACCESS_TOKEN = "access_token"
-        private const val KEY_REFRESH_TOKEN = "refresh_token"
+        private const val MASTER_KEY_URI = "android-keystore://auth_encrypted_master_key"
+        private val ACCESS_TOKEN_KEY = stringPreferencesKey("access_token")
+        private val REFRESH_TOKEN_KEY = stringPreferencesKey("refresh_token")
     }
 }

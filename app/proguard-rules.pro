@@ -61,10 +61,14 @@
     @javax.inject.* <methods>;
 }
 
-# --- Room (ready when @Database is added) ---
+# --- Room ---
 -keep class * extends androidx.room.RoomDatabase
 -keep @androidx.room.Entity class *
 -dontwarn androidx.room.paging.**
+
+# --- SQLCipher ---
+-keep class net.zetetic.** { *; }
+-dontwarn net.zetetic.**
 
 # --- Coil ---
 -dontwarn coil.**
@@ -93,10 +97,15 @@
 -keep class * extends androidx.paging.PagingSource { *; }
 -keep class com.ngoctientnt.template.core.auth.data.remote.dto.** { *; }
 -keep class com.ngoctientnt.template.core.auth.domain.model.** { *; }
+-keep class com.ngoctientnt.template.core.database.domain.model.** { *; }
 
-# --- Security Crypto ---
+# --- Security Crypto (legacy migration only) ---
 -keep class androidx.security.crypto.** { *; }
 -dontwarn androidx.security.crypto.**
+
+# --- Tink (encrypted DataStore) ---
+-keep class com.google.crypto.tink.** { *; }
+-dontwarn com.google.crypto.tink.**
 
 # --- Window extensions (Compose / Activity) ---
 -dontwarn androidx.window.**

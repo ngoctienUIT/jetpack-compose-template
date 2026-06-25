@@ -76,5 +76,6 @@ Follow this guide step-by-step when starting a new project from this template to
 - [ ] **R8 Verification**: Run `./gradlew :app:assembleProductionRelease` and verify the app opens without crashes.
 - [ ] **Privacy Policy**: Review `AppInfoConfig` in `ConfigModule.kt`. Ensure you only send necessary device headers.
 - [ ] **Security**: Ensure `base-config cleartextTrafficPermitted="false"` is set in `network_security_config.xml`.
+- [ ] **Database backup**: If storing sensitive data locally, verify `backup_rules.xml` and `data_extraction_rules.xml` exclude your Room database and passphrase prefs (see [README_ROOM.md](README_ROOM.md)).
 - [ ] **Localization**: Verify all hardcoded strings are moved to `strings.xml` (En/Vi).
 - [ ] **CI**: Push to GitHub/GitLab and ensure the CI pipeline passes.
